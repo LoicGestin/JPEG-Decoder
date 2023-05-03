@@ -1,0 +1,42 @@
+Fonctions:
+
+Lecture en-tête JPEG:
+-entrées : texte en hexa
+-sorties : infos de tailles, couleurs, marqueurs (voir Annexe)
+
+Gestion des tables de Huffman:
+-entrées : caractères et leur probas
+-sorties : mots binaires
+
+Extraction des blocs:
+-entrées : image
+-sorties : cases
+
+Quantification inverse :
+-entrées : bloc fréquentiel, table de quatification (luminance/chrominance)
+-sorties : matrice de quantification inverse
+
+Zig-Zag :
+-entrées : vecteur 1x64
+-sorties : matrice 8x8
+
+iDCT :
+-entrées : coordonnées spatiales x et y, bloc fréquentiel (voir formule)
+-sorties : bloc spatial
+
+Upsampling :
+-entrées : échantillon / sous-échantillons
+-sorties : sur échantillon
+
+YCbCr to RGB : 
+-entrées : Y, Cb, Cr
+-sorties : R, G, B
+
+
+Ecriture du fichier PPM
+-entrées : R,G,B
+-sorties : image PPM
+
+
+
+
