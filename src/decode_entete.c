@@ -1,26 +1,86 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+typedef	unsigned char BYTE;
 struct data{
+    // DQT
+    int * quantization_precision;
+    int ** quantization_table_read;
+    // SOF0
+    int sample_precision;
+    int image_height;
+    int image_width;
+    int nb_of_component;
+    struct component* list_component;
+    // DHT
+    int nb_dht;
+    int nb_ac;
+    struct dht_ac* list_dht;
+    struct dht_ac* list_ac;
+    // SOS
+    int nb_component_scan;
+    struct scan_component* list_scan_components;
 
 };
-typedef	unsigned char BYTE;
-void decode_entete(){
+struct dht_ac{
+    int table_type;// 0 = DC, 1 ==AC
+    int table_index;
+    int nb_symbols;
+    int symbols[16];
+};
+struct component{
+    int id;
+    int sampling_horizontal;
+    int sampling_vertical;
+    int quantization_table_index;
+};
+struct scan_component {
+    int scan_component_index;
+    int associated_component_id;
+    int associated_dc_huffman_table_index;
+    int associated_ac_huffman_table_index;
+};
+struct data* init_data() {
+    struct data* data = malloc(sizeof(struct data));
+
+    // DQT
+    data->quantization_precision =  malloc(4 * sizeof(int));
+    data->quantization_table_read = malloc(4 * sizeof(int*));
+    for (int i = 0; i < 4; i++) {
+        data->quantization_table_read[i] = malloc(64 * sizeof(int));
+    }
+    // SOF0
+    data->sample_precision = 0;
+    data->image_height = 0;
+    data->image_width = 0;
+    data->nb_of_component = 4;
+    data->list_component =  malloc(4 * sizeof(struct component));
+
+    // DHT
+    data->nb_ac = 4;
+    data->nb_dht = 4;
+    data->list_dht =  malloc(4 * sizeof(struct dht_ac ));
+    data->list_ac =  malloc(4 * sizeof(struct dht_ac ));
+    // SOS
+    data->nb_component_scan = 4;
+    data->list_scan_components =   malloc(4 * sizeof(struct scan_component));
+
+    return data;
+}
+
+struct data* decode_entete(char * path){
     FILE* file = fopen("C:/Users/loicg/CLionProjects/team19/images/invader.jpeg", "rb");
 
     if(file == NULL){
         printf("Erreur durant l'ouverture du fichier");
     }
+    struct data *d = init_data();
+
     int cpt=0;
     BYTE byte;
     int marker_detected = 0;
     int marker_length = 0;
-
-
     while (fread(&byte, 1, 1, file)) {
-
-
-
         if(byte == 0xFF){
             marker_detected = 1;
             continue;
@@ -43,8 +103,6 @@ void decode_entete(){
 
             marker_length =(msb << 8) | lsb;
 
-
-
             BYTE *data =  malloc(sizeof(BYTE*) * marker_length -2 );
             // Pas oublier le -2 car les octets pour donner la taille font partie de la taille
             fread(data, marker_length - 2, 1, file);
@@ -63,6 +121,12 @@ void decode_entete(){
                     printf("   quantization table index %d\n", index);
                     printf("   quantization table precision %d bits\n",precision);
                     printf("   quantization table read (64 bytes)\n");
+
+                    d->quantization_precision[index] = precision;
+                    for (int i = 0; i < 64; i++) {
+                        d->quantization_table_read[index][i] = data[i + 1];
+                    }
+
                     break;
                 }
                 case (0xC0):{
@@ -73,8 +137,11 @@ void decode_entete(){
                     printf("   sample precision %d\n",precision);
                     printf("   image height %d\n",height);
                     printf("   image width %d\n",width);
-
+                    d->sample_precision = precision;
+                    d->image_height = height;
+                    d->image_width = width;
                     BYTE nb_components = data[5];
+                    d->nb_of_component = nb_components;
                     printf("   nb of component %d\n",nb_components);
 
                     for (int i = 0; i < nb_components; i++) {
@@ -86,6 +153,10 @@ void decode_entete(){
                         printf("     id: %d\n", component_id);
                         printf("     sampling factors (hxv) %dx%d\n", sampling_factors >> 4, sampling_factors & 0xF);
                         printf("     quantization table index: %d\n", quantization_table_index);
+                        d->list_component[i].id = component_id;
+                        d->list_component[i].sampling_horizontal = sampling_factors >> 4;
+                        d->list_component[i].sampling_vertical = sampling_factors & 0xF;
+                        d->list_component[i].quantization_table_index = quantization_table_index;
                     }
                     break;
 
@@ -153,6 +224,7 @@ void decode_entete(){
     }
     printf("bitstream empty\n");
     fclose(file);
+    return d;
 }
 
 int main(int argc, char **argv)
@@ -168,7 +240,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
     */
-    decode_entete();
+    struct data *d = decode_entete("C:/Users/loicg/CLionProjects/team19/images/invader.jpeg");
     /* On se congratule. */
     return EXIT_SUCCESS;
 }
