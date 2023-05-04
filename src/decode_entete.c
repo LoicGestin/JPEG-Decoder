@@ -13,20 +13,21 @@ struct data{
     int nb_of_component;
     struct component* list_component;
     // DHT
-    int nb_dht;
     int nb_ac;
-    struct dht_ac* list_dht;
-    struct dht_ac* list_ac;
+    int nb_dc;
+    struct dht_ac_dc* list_dc;
+    struct dht_ac_dc* list_ac;
     // SOS
     int nb_component_scan;
     struct scan_component* list_scan_components;
 
 };
-struct dht_ac{
+struct dht_ac_dc{
     int table_type;// 0 = DC, 1 ==AC
     int table_index;
     int nb_symbols;
     int symbols[16];
+    int *huff_values;
 };
 struct component{
     int id;
@@ -36,7 +37,6 @@ struct component{
 };
 struct scan_component {
     int scan_component_index;
-    int associated_component_id;
     int associated_dc_huffman_table_index;
     int associated_ac_huffman_table_index;
 };
@@ -50,26 +50,24 @@ struct data* init_data() {
         data->quantization_table_read[i] = malloc(64 * sizeof(int));
     }
     // SOF0
-    data->sample_precision = 0;
-    data->image_height = 0;
-    data->image_width = 0;
+
     data->nb_of_component = 4;
     data->list_component =  malloc(4 * sizeof(struct component));
 
     // DHT
     data->nb_ac = 4;
-    data->nb_dht = 4;
-    data->list_dht =  malloc(4 * sizeof(struct dht_ac ));
-    data->list_ac =  malloc(4 * sizeof(struct dht_ac ));
+    data->nb_dc = 4;
+    data->list_dc =  malloc(4 * sizeof(struct dht_ac_dc ));
+    data->list_ac =  malloc(4 * sizeof(struct dht_ac_dc ));
     // SOS
-    data->nb_component_scan = 4;
-    data->list_scan_components =   malloc(4 * sizeof(struct scan_component));
+    data->nb_component_scan = 0;
+    data->list_scan_components =  NULL;
 
     return data;
 }
 
 struct data* decode_entete(char * path){
-    FILE* file = fopen("../images/invader.jpeg", "rb");
+    FILE* file = fopen(path, "rb");
 
     if(file == NULL){
         printf("Erreur durant l'ouverture du fichier");
@@ -178,13 +176,35 @@ struct data* decode_entete(char * path){
                         printf("ERREUR NB TOTAL SYMBOLE > 256");
                     }
                     printf("   total nb of Huffman symbols %d\n", total_symbols);
+                    struct dht_ac_dc *current_dht = NULL;
+                    if(((data[0] >> 4) & 0x01) == 1){
+                        d->nb_ac++;
+                        current_dht =  &d->list_ac[index];
+                    }
+                    else{
+                        d->nb_dc++;
+                        current_dht =  &d->list_ac[index];
+                    }
+
+
+                    current_dht->table_index = index;
+                    current_dht->nb_symbols = total_symbols;
+                    for (int i = 0; i < 16; i++) {
+                        current_dht->symbols[i] = symbols[i];
+                    }
+                    current_dht->huff_values = malloc(total_symbols * sizeof(BYTE));
+                    for (int i = 0, offset = 17; i < total_symbols; i++, offset++) {
+                        current_dht->huff_values[i] = data[offset];
+                    }
 
                     break;
                 }
                 case(0xDA):{
                     printf("[SOS] length %d bytes\n", marker_length);
                     BYTE nb_composante = data[0];
+                    d->nb_component_scan = nb_composante;
                     printf("   nb of components in scan %d\n",nb_composante);
+                    d->list_scan_components = malloc(nb_composante * sizeof(struct scan_component));
                     for (int i = 0;i < nb_composante; i++){
                         printf("   scan component index %d\n",i);
                         BYTE ic_composante = data[1 + (2*i)];
@@ -192,6 +212,9 @@ struct data* decode_entete(char * path){
                         BYTE id_DC_AC = data[2 + (2*i)];
                         printf("     associated to DC Huffman table of index %d\n",id_DC_AC >> 4);
                         printf("     associated to AC Huffman table of index %d\n",id_DC_AC & 0xF0);
+                        d->list_scan_components[i].scan_component_index = ic_composante;
+                        d->list_scan_components[i].associated_dc_huffman_table_index = id_DC_AC >> 4;
+                        d->list_scan_components[i].associated_ac_huffman_table_index = id_DC_AC & 0xF;
                     }
                     printf("   other parameters ignored (%d bytes).\n", marker_length - 2 - 1 - nb_composante * 2);
                     printf("   End of Scan Header (SOS)\n");

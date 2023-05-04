@@ -45,6 +45,8 @@ void create_ppm(char * file_name, const int * R, const int * G, const int * B, i
         fputc(green_pixel, ppm);
         fputc(blue_pixel, ppm);
 
+        // test si >0 et <256 ... voir si nécéssaire
+
     }
     fclose(ppm);
 }
