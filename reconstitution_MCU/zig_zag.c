@@ -3,7 +3,10 @@
 int ** zig_zag(int *tab){
 
 
-    int matrice[8][8];
+    int **matrice = malloc(8*sizeof(int*));
+    for(int i=0; i<8; i++){
+        matrice[i]=malloc(8*sizeof(int));
+    }
     int i =0;
     int j=0;
     int k=0;
@@ -71,6 +74,21 @@ int ** zig_zag(int *tab){
         
     
    return matrice;
+}
+
+int main(){
+    int *tab=malloc(64*sizeof(int));
+    for(int i=0; i<64; i++){
+        tab[i]=i;
+    }
+    int **matrice=zig_zag(tab);
+    for(int i = 0; i < 8; i ++){
+        for(int j = 0; j < 8; j ++){
+            printf("%02d ",matrice[i][j]);
+        }
+        printf("\n");
+    }
+    return 0;
 }
 
 

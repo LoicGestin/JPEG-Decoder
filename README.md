@@ -18,3 +18,53 @@ Rajouter **régulièrement** des informations sur l'avancement de votre projet e
 - Problème relationnel au sein du groupe ? Contactez [Pascal](https://fr.wikipedia.org/wiki/Pascal,_le_grand_fr%C3%A8re) !
 - Besoin de prendre l'air ? Le [Mont Rachais](https://fr.wikipedia.org/wiki/Mont_Rachais) est accessible à pieds depuis la salle E301 !
 - Un peu juste sur le projet à quelques heures de la deadline ? Le [Montrachet](https://www.vinatis.com/achat-vin-puligny-montrachet) peut faire passer l'envie à vos profs de vous mettre une tôle !
+
+
+# Fonctions
+
+Lecture en-tête JPEG:
+-entrées : chemin du fichier jpeg
+-sorties : structure data : toutes les infos
+
+Gestion des tables de Huffman:
+-entrées : caractères et leur probas
+-sorties : mots binaires
+
+Extraction des blocs:
+-entrées : image
+-sorties : cases
+
+Quantification inverse :
+-entrées : bloc fréquentiel, table de quatification (luminance/chrominance)
+-sorties : matrice de quantification inverse
+
+Zig-Zag :
+-entrées : vecteur 1x64
+-sorties : matrice 8x8
+
+iDCT :
+-entrées : coordonnées spatiales x et y, bloc fréquentiel (voir formule)
+-sorties : bloc spatial
+
+Upsampling :
+-entrées : échantillon / sous-échantillons
+-sorties : sur échantillon
+
+YCbCr to RGB : 
+-entrées : Y, Cb, Cr
+-sorties : R, G, B
+
+
+Ecriture du fichier PPM
+-entrées : R,G,B
+-sorties : image PPM
+
+# Structure du projet
+
+
+
+
+
+# Organisation
+https://trello.com/invite/team19ensimag/ATTI37e61afe3960d5fd88515a0b9a7716bc8A933FE0
+
