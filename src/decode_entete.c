@@ -304,7 +304,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
     */
-    struct data *d = decode_entete("C:/Users/loicg/CLionProjects/team19/images/invader.jpeg");
+    struct data *d = decode_entete("../images/invader.jpeg");
     /* On se congratule. */
     return EXIT_SUCCESS;
 }

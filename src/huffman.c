@@ -2,6 +2,17 @@
 #include <stdio.h>
 #include <string.h>
 
+struct arbre_binaire{
+    struct arbre_binaire *parent;
+    struct arbre_binaire *fils_droit;
+    struct arbre_binaire *fils_gauche;
+    int *clé;
+};
+
+struct arbre_binaire arbre_huffman(struct dht_ac_dc *huff){
+    
+}
+
 
 int main(int argc, char **argv)
 {
