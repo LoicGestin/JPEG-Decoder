@@ -14,10 +14,6 @@ struct scan_component ;
 
 struct data* init_data();
 
-void decode_huffman(struct data* d, int index, int table_type);
-
-char * decimal_to_binary(int val, int length);
-
 struct data* decode_entete(char * path);
 
 #endif /* _DECODE_ENTETE_H_ */
