@@ -1,7 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-typedef	unsigned char BYTE;
+
+#include <decode_entete.h>
+
 struct data{
     // DQT
     int * quantization_precision;
@@ -42,6 +44,7 @@ struct scan_component {
     int associated_dc_huffman_table_index;
     int associated_ac_huffman_table_index;
 };
+
 struct data* init_data() {
     struct data* data = malloc(sizeof(struct data));
 
