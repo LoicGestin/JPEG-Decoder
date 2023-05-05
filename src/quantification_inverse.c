@@ -1,16 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int * quantification_inverse(int **frequentiel, int *quantification){
+#include "../include/decode_entete.h"
 
+int * quantification_inverse(struct data *d, int index, int *frequentiel){
+    int *quantification = d.quantization_table_read[index];
     int *table = malloc(64*sizeof(int*));
-    int k=0;
-    for(int i=0; i<8; i++){
-        for(int j=0; j<8; j++){
-            table[k]= frequentiel[i][j]*quantification[k];
-            k++;  
+    for(int i=0; i<64; i++){
+        table[i]= frequentiel[i]*quantification[i]; 
         }
-    }
     
     return table; 
 }
