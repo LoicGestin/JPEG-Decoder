@@ -60,7 +60,7 @@ Ecriture du fichier PPM
 -sorties : image PPM
 
 # Structure du projet
-
+![Photo](Photo.jpg)
 
 
 
