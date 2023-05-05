@@ -2,6 +2,11 @@
 #include<stdlib.h>
 
 int** sur_ech_h(int ** mat, int l, int c){
+
+    if(l<1 || l>4 || c<1 || c>4){
+        return 0;
+    }
+
     int i,j;
     int ** new_mat = (int **)malloc(l * sizeof(int *));
 
@@ -36,6 +41,11 @@ int** sur_ech_h(int ** mat, int l, int c){
 }
 
 int** sur_ech_v(int ** mat, int l, int c){
+
+    if(l<1 || l>4 || c<1 || c>4){
+        return 0;
+    }
+
     int i, j;
     int new_l = 2*l;
     int ** new_mat = (int **)malloc(new_l * sizeof(int *));
