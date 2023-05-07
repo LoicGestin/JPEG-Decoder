@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-void create_pgm(char * file_name, const int * nuance, int width, int height){
+void create_pgm(char * file_name,  int **nuance, int width, int height){
     FILE *pgm = fopen(file_name, "w");
     if(pgm == NULL)
     {
@@ -14,7 +14,7 @@ void create_pgm(char * file_name, const int * nuance, int width, int height){
     fprintf(pgm, "255\n");
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            int pixel = nuance[i];
+            int pixel = nuance[i][j];
             if (pixel < 0) {
                 pixel = 0;
             } else if (pixel > 255) {

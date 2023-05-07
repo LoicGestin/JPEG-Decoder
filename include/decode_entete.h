@@ -4,13 +4,7 @@
 
 typedef	unsigned char BYTE;
 
-struct data;
 
-struct dht_ac_dc;
-
-struct component;
-
-struct scan_component ;
 
 struct data* init_data();
 
