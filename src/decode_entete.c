@@ -125,23 +125,6 @@ void decode_huffman(struct data* d, int index, int table_type){
 
 
 }
-
-/*
-char * decimal_to_binary(int val, int length){
-    char *res = malloc(length + 1);
-    res[length] = '\0';
-
-    for (int i = length - 1; i >= 0; i--) {
-
-        res[i] = (val & 1) + '0';
-        val >>= 1;
-    }
-
-    return res;
-}
-*/
-
-
 struct data* init_data() {
     struct data* data = malloc(sizeof(struct data));
 
@@ -180,7 +163,7 @@ int read_bit(BYTE byte, int num_bit){
     return (byte >> ( 7 - num_bit )) & 1 ;
 }
 
-uint16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  uint16_t * block){
+uint16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  int16_t * block){
     struct dht_ac_dc *current_dht = table_type ?&d->list_dc[index] : &d->list_ac[index];
 
 
@@ -258,7 +241,7 @@ uint16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  u
             block[cpt] =0;
             cpt ++;
         }
-        printf("byte %x, symbole %x, magnitude = %x, value = %x , num_zero %d, cpt = %d\n",symbol,magnitude,value,symbol >> 4,cpt );
+        printf("symbole %x, magnitude = %x, value = %x , num_zero %d, cpt = %d\n",symbol,magnitude,value,symbol >> 4,cpt );
         current_cel = current_dht->racine_huffman;
     }
     for(int i =0; i < 64; i++){
@@ -455,11 +438,11 @@ struct data* decode_entete(char * path){
     d->num_bit = -1;
     return d;
 }
-int * quantification_inverse(struct data *d, int index,  const uint16_t *frequentiel){
+int * quantification_inverse(struct data *d, int index,  const int16_t *frequentiel){
     int *quantification = d->quantization_table_read[index];
     int *table = malloc(64*sizeof(int*));
     for(int i=0; i<64; i++){
-        table[i]= frequentiel[i]*quantification[i];
+        table[i]= frequentiel[i]/quantification[i];
     }
 
     return table;
@@ -541,7 +524,7 @@ int ** zig_zag(const int *tab){
 
     return matrice;
 }
-uint8_t iDCT(int x, int y , int **phi){
+uint8_t iDCT(int x, int y, int **phi) {
     int n = 8;
 
     float dep = (1 / pow(2*n, 1/2));
@@ -549,18 +532,18 @@ uint8_t iDCT(int x, int y , int **phi){
 
     float t2 = 0.0;
     for (int mu = 1; mu<n; mu++){
-        t2 += (1 / pow(2*n, 1/2)) * cosf(((2*x+1)*mu*M_PI)/(2*n)) * phi[0][mu];
+        t2 += (1 / pow(2*n, 1/2)) * cosf(((2*y+1)*mu*M_PI)/(2*n)) * phi[0][mu];
     }
 
     float t3 = 0.0;
     for (int lambda = 1; lambda<n; lambda++){
-        t3 += (1 / pow(2*n, 1/2)) * cosf(((2*y+1)*lambda*M_PI)/(2*n)) * phi[lambda][0];
+        t3 += (1 / pow(2*n, 1/2)) * cosf(((2*x+1)*lambda*M_PI)/(2*n)) * phi[lambda][0];
     }
 
     float t4 = 0.0;
     for (int lambda = 1; lambda<n; lambda++){
         for (int mu = 1; mu<n; mu++){
-            t4 += cosf(((2*x+1)*mu*M_PI)/(2*n)) * cosf(((2*y+1)*lambda*M_PI)/(2*n)) * phi[lambda][mu];
+            t4 += cosf(((2*y+1)*mu*M_PI)/(2*n)) * cosf(((2*x+1)*lambda*M_PI)/(2*n)) * phi[lambda][mu];
         }
     }
 
@@ -578,10 +561,10 @@ uint8_t iDCT(int x, int y , int **phi){
 
     return S;
 }
-void create_pgm(char * file_name,  int **nuance, int width, int height){
-    FILE *pgm = fopen(file_name, "w");
-    if(pgm == NULL)
-    {
+
+void create_pgm(char *file_name, uint8_t **nuance, int width, int height) {
+    FILE *pgm = fopen(file_name, "wb");
+    if (pgm == NULL) {
         printf("Unable to create pgm file.\n");
         exit(EXIT_FAILURE);
     }
@@ -590,13 +573,8 @@ void create_pgm(char * file_name,  int **nuance, int width, int height){
     fprintf(pgm, "255\n");
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            int pixel = nuance[i][j];
-            if (pixel < 0) {
-                pixel = 0;
-            } else if (pixel > 255) {
-                pixel = 255;
-            }
-            fputc(pixel, pgm);
+            uint8_t pixel = nuance[i][j];
+            fwrite(&pixel, 1, 1, pgm);
         }
     }
     fclose(pgm);
@@ -606,7 +584,7 @@ int main(int argc, char **argv)
     struct data *d = decode_entete("C:/Users/loicg/CLionProjects/team19/images/invader.jpeg");
 
     printf("%x \n", d->byte);
-    uint16_t *block = malloc(sizeof (uint16_t) * 64);
+    int16_t *block = malloc(sizeof (int16_t) * 64);
     //fread(&d->byte, 1, 1, d->file);
     decode_ac_dc(d,0,1,d->file,block);
     decode_ac_dc(d,0,0,d->file,block);
@@ -625,20 +603,23 @@ int main(int argc, char **argv)
         printf("\n");
     }
     printf("\n\n");
-    for(int i =0; i < 8; i++){
-        for(int j =0; j < 8; j++){
-            matrice[i][j] = iDCT(i,j,matrice);
-        }
+
+    uint8_t **pixel  = malloc(8 * sizeof(uint8_t *));
+    for(int i = 0; i < 8; i++) {
+        pixel[i] = malloc(8 * sizeof(uint8_t));
     }
-    printf("\n\n");
+    printf("\n");
     for(int i =0; i < 8; i++){
         for(int j =0; j < 8; j++){
-            printf("%x ", matrice[i][j]);
+            pixel[i][j]= iDCT(i,j,matrice);
+            printf("%02x ",pixel[i][j]);
         }
         printf("\n");
     }
-    create_pgm("test_invaders.pgm",matrice,8,8);
-    //problème ordre, manque upsampling ?
+
+
+    create_pgm("test_invaders.pgm",pixel,8,8);
+
 
 
     return EXIT_SUCCESS;
