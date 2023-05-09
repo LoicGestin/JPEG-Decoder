@@ -16,7 +16,7 @@ void sur_ech_h(uint8_t *Cb, uint8_t *Cr, int largeur, int hauteur){
             new_Cr[2*x + y*(largeur*2)] = Cr[x + y*largeur];
             
             // calcul de la moyenne entre un pixel et le précendant et on place la valeur moyenne dans la nouvelle matrice
-            if (x > 0) {
+            if (x>0) {
                 new_Cb[2*x - 1 + y*(largeur*2)] = (Cb[x - 1 + y*largeur] + Cb[x + y*largeur]) / 2;
                 new_Cr[2*x - 1 + y*(largeur*2)] = (Cr[x - 1 + y*largeur] + Cr[x + y*largeur]) / 2;
             }
@@ -46,7 +46,7 @@ void sur_ech_v(uint8_t *Cb, uint8_t *Cr, int largeur, int hauteur){
             new_Cr[x + 2*y*largeur] = Cr[x + y*largeur];
             
             // calcul de la moyenne entre un pixel et le précendant et on place la valeur moyenne dans la nouvelle matrice
-            if (y > 0) {
+            if (y>0) {
                 new_Cb[x + (2*y - 1)*largeur] = (Cb[x + (y - 1)*largeur] + Cb[x + y*largeur]) / 2;
                 new_Cr[x + (2*y - 1)*largeur] = (Cr[x + (y - 1)*largeur] + Cr[x + y*largeur]) / 2;
             }
@@ -95,7 +95,7 @@ int main(){
 
     printf("\n");
     
-    // utilisation du sur echantillonnage horizontal
+    // utilisation du sur echantillonnage vertical
     sur_ech_v((uint8_t *)Cb, (uint8_t *)Cr, 4, 4);
     
     // les matrices de sorties
@@ -118,6 +118,3 @@ int main(){
 
     return 0;
 }
-
-
-
