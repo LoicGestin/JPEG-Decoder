@@ -6,7 +6,7 @@
 
 #include "../include/decode_entete.h"
 #include "../include/huffman.h"
-#include "../include/extract_block.h"
+#include "../include/extract_bloc.h"
 #include "../include/iDCT.h"
 #include "../include/ppm.h"
 #include "../include/upsampling.h"
@@ -16,7 +16,7 @@
 
 int main(int argc, char **argv)
 {
-    struct data *d = decode_entete("../images/invader.jpg");
+    struct data *d = decode_entete("../images/invader.jpeg");
 
     printf("%x \n", d->byte);
     int16_t *block = malloc(sizeof (int16_t) * 64);
@@ -39,19 +39,17 @@ int main(int argc, char **argv)
     }
     printf("\n\n");
 
-    uint8_t **pixel  = malloc(8 * sizeof(uint8_t *));
-    for(int i = 0; i < 8; i++) {
-        pixel[i] = malloc(8 * sizeof(uint8_t));
-    }
+      
     printf("\n");
+    uint8_t **pixel= iDCT(matrice);
+
+
     for(int i =0; i < 8; i++){
         for(int j =0; j < 8; j++){
-            pixel[i][j]= iDCT(i,j,matrice);
-            printf("%02x ",pixel[i][j]);
+            printf("%02x ", pixel[i][j]);
         }
         printf("\n");
     }
-
 
     create_pgm("test_invaders.pgm",pixel,8,8);
 

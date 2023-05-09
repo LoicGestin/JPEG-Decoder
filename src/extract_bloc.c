@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include<stdlib.h>
 
-#include "../include/extract_block.h"
+#include "../include/extract_bloc.h"
 
 void init_blocks(struct data *d) {
     int nb_block = d->image_height * d->image_width;

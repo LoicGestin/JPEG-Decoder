@@ -5,6 +5,7 @@
 #include <math.h>
 
 #include "../include/decode_entete.h"
+#include "../include/huffman.h"
 
 
 
