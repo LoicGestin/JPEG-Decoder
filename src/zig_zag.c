@@ -3,16 +3,16 @@
 
 #include "../include/zig_zag.h"
 
-int ** zig_zag(const int *tab){
+int16_t ** zig_zag(const int16_t *tab){
 
 
-    int **matrice = malloc(8*sizeof(int*));
-    for(int i=0; i<8; i++){
-        matrice[i]=malloc(8*sizeof(int));
+    int16_t **matrice = malloc(8*sizeof(int16_t*));
+    for(int8_t i=0; i<8; i++){
+        matrice[i]=malloc(8*sizeof(int16_t));
     }
-    int i =0;
-    int j=0;
-    int k=0;
+    int8_t i =0;
+    int8_t j=0;
+    int8_t k=0;
     matrice[i][j]=tab[k];
     j++;
     k++;

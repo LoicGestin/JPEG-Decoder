@@ -13,23 +13,19 @@ struct data* init_data() {
     struct data* data = malloc(sizeof(struct data));
 
     // DQT
-    data->quantization_precision =  malloc(4 * sizeof(int));
-    data->quantization_table_read = malloc(4 * sizeof(int*));
+    data->quantization_precision =  malloc(4 * sizeof(int8_t));
+    data->quantization_table_read = malloc(4 * sizeof(int16_t*));
     for (int i = 0; i < 4; i++) {
-        data->quantization_table_read[i] = malloc(64 * sizeof(int));
+        data->quantization_table_read[i] = malloc(64 * sizeof(int16_t));
     }
     // SOF0
-
     data->nb_of_component = 4;
     data->list_component =  malloc(4 * sizeof(struct component));
 
     // DHT
-    data->nb_ac = 4;
-    data->nb_dc = 4;
     data->list_dc =  malloc(4 * sizeof(struct dht_ac_dc ));
     data->list_ac =  malloc(4 * sizeof(struct dht_ac_dc ));
     // SOS
-    data->nb_component_scan = 0;
     data->list_scan_components =  NULL;
 
     return data;
@@ -42,10 +38,10 @@ struct data* decode_entete(char * path){
         printf("Erreur durant l'ouverture du fichier");
     }
     struct data *d = init_data();
-    int stop=0;
+    int8_t stop=0;
     BYTE byte;
-    int marker_detected = 0;
-    int marker_length = 0;
+    int8_t marker_detected = 0;
+    int32_t marker_length = 0;
     while (fread(&byte, 1, 1, file)) {
         if (byte == 0xFF) {
             marker_detected = 1;
@@ -66,6 +62,7 @@ struct data* decode_entete(char * path){
 
             fread(&msb, 1, 1, file);
             fread(&lsb, 1, 1, file);
+            printf("msb : %x,  lsb : %x : \n", msb,lsb);
 
             marker_length = (msb << 8) | lsb;
 
@@ -97,6 +94,9 @@ struct data* decode_entete(char * path){
                 }
                 case (0xC0): {
                     printf("[S0FO] length %d bytes\n", marker_length);
+                     for (int8_t i = 0; i < marker_length - 2; i++) {
+                        printf("%02x ", data[i]);
+                     }
                     BYTE precision = data[0];
                     BYTE height = (data[1] << 8) | data[2];
                     BYTE width = (data[3] << 8) | data[4];
@@ -110,8 +110,8 @@ struct data* decode_entete(char * path){
                     d->nb_of_component = nb_components;
                     printf("   nb of component %d\n", nb_components);
 
-                    for (int i = 0; i < nb_components; i++) {
-                        int offset = 6 + i * 3;
+                    for (int8_t i = 0; i < nb_components; i++) {
+                        int32_t offset = 6 + i * 3;
                         BYTE component_id = data[offset];
                         BYTE sampling_factors = data[offset + 1];
                         BYTE quantization_table_index = data[offset + 2];
@@ -119,24 +119,22 @@ struct data* decode_entete(char * path){
                         printf("     id: %d\n", component_id);
                         printf("     sampling factors (hxv) %dx%d\n", sampling_factors >> 4, sampling_factors & 0xF);
                         printf("     quantization table index: %d\n\n", quantization_table_index);
-                        d->list_component[i].id = component_id;
                         d->list_component[i].sampling_horizontal = sampling_factors >> 4;
                         d->list_component[i].sampling_vertical = sampling_factors & 0xF;
-                        d->list_component[i].quantization_table_index = quantization_table_index;
                     }
                     break;
 
                 }
                 case (0xC4): {
                     printf("[DHT] length %d bytes\n", marker_length);
-                    int type = ((data[0] >> 4) & 0x01) == 0x00;
+                    int8_t type = ((data[0] >> 4) & 0x01) == 0x00;
                     BYTE index = data[0] & 0x0F;
                     printf("   Huffman table type: %s\n", type ? "DC" : "AC");
                     printf("   Huffman table index : %d\n", index);
 
                     int total_symbols = 0;
                     BYTE nb_code[16];
-                    for (int i = 0; i < 16; i++) {
+                    for (int8_t i = 0; i < 16; i++) {
                         nb_code[i] = data[i + 1];
                         total_symbols += data[i + 1];
                     }
@@ -146,23 +144,21 @@ struct data* decode_entete(char * path){
                     printf("   total nb of Huffman symbols %d\n", total_symbols);
                     struct dht_ac_dc *current_dht = NULL;
                     if (type) {
-                        d->nb_dc++;
                         current_dht = &d->list_dc[index];
                     } else {
-                        d->nb_ac++;
                         current_dht = &d->list_ac[index];
                     }
                     current_dht->table_type = type;
 
 
-                    current_dht->table_index = index;
+        
                     current_dht->nb_symbols = total_symbols;
-                    for (int i = 0; i < 16; i++) {
+                    for (int8_t i = 0; i < 16; i++) {
                         current_dht->nb_code[i] = nb_code[i];
 
                     }
                     current_dht->huff_values = malloc(total_symbols * sizeof(BYTE));
-                    for (int i = 0, offset = 17; i < total_symbols; i++, offset++) {
+                    for (int8_t i = 0, offset = 17; i < total_symbols; i++, offset++) {
                         current_dht->huff_values[i] = data[offset];
                     }
                     decode_huffman(d, index, type);
@@ -173,8 +169,6 @@ struct data* decode_entete(char * path){
                                current_dht->huff_values[i]);
                     }
                      */
-                    char initial_path[1] = "";
-                    display_huffman_tree(current_dht->racine_huffman, initial_path);
                     printf("\n");
 
 
@@ -186,7 +180,7 @@ struct data* decode_entete(char * path){
                     d->nb_component_scan = nb_composante;
                     printf("   nb of components in scan %d\n", nb_composante);
                     d->list_scan_components = malloc(nb_composante * sizeof(struct scan_component));
-                    for (int i = 0; i < nb_composante; i++) {
+                    for (int16_t i = 0; i < nb_composante; i++) {
                         printf("   scan component index %d\n", i);
                         BYTE ic_composante = data[1 + (2 * i)];
                         printf("     associated to component of id %d (frame index %d)\n", ic_composante, i);

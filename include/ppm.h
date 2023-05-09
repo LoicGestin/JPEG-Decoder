@@ -1,8 +1,10 @@
 #ifndef _PPM_H_
 #define _PPM_H_
 
-void create_ppm(char * file_name, const int * R, const int * G, const int * B, int width, int height);
+#include <stdint.h>
 
-void create_pgm(char *file_name, uint8_t **nuance, int width, int height);
+void create_ppm(char * file_name, const uint8_t **R, const uint8_t ** G, const uint8_t ** B, int8_t width, int8_t height);
+
+void create_pgm(char *file_name, uint8_t **nuance, int8_t width, int8_t height);
 
 #endif /* _PPM_H_*/

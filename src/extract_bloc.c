@@ -4,17 +4,17 @@
 #include "../include/extract_bloc.h"
 
 void init_blocks(struct data *d) {
-    int nb_block = d->image_height * d->image_width;
-    d->decoded_blocks = malloc( sizeof(int ) * nb_block );
-    for (int i = 0; i < nb_block; i++) {
-        d->decoded_blocks[i] = malloc(sizeof(int ) * 64);
+    int32_t nb_block = d->image_height * d->image_width;
+    d->decoded_blocks = malloc( sizeof(int16_t ) * nb_block );
+    for (int32_t i = 0; i < nb_block; i++) {
+        d->decoded_blocks[i] = malloc(sizeof(int16_t ) * 64);
     }
 }
-int read_bit(BYTE byte, int num_bit){
+int8_t read_bit(BYTE byte, int8_t num_bit){
     //printf("byte %x  : numéro %d = %d\n", byte,num_bit,(byte >> (num_bit )) & 1);
     return (byte >> ( 7 - num_bit )) & 1 ;
 }
-int16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  int16_t * block){
+int16_t * decode_ac_dc(struct data *d, int8_t index, int8_t table_type,FILE* file,  int16_t * block){
     struct dht_ac_dc *current_dht = table_type ?&d->list_dc[index] : &d->list_ac[index];
 
 
@@ -24,13 +24,13 @@ int16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  in
     }
     //printf("byte = %x\n", d->byte);
 
-    int bit;
+    int8_t bit;
 
 
     struct cellule_huffman *current_cel = current_dht->racine_huffman;
 
-    int cpt =table_type ? 0 : 1;
-    int val = table_type ? 1 : 64;
+    int8_t cpt =table_type ? 0 : 1;
+    int8_t val = table_type ? 1 : 64;
 
     while(cpt < val){
         // JE SUIS REST2 BLOQU2 2 PUTAIN DHEURE CAR J4AVAIS MIS UN && !!!!!!!!!!!!!!!!!!!!!!!!
@@ -48,7 +48,8 @@ int16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  in
         if(current_cel->symbol == 0xff){
             printf("ERORR");
         }
-        int8_t symbol =(int8_t) current_cel->symbol;
+     
+        int8_t symbol =current_cel->symbol;
 
         if(symbol == 0){
             while(cpt != 64){
@@ -57,8 +58,8 @@ int16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  in
                 cpt ++;
             }
         }
-        int8_t magnitude = (int8_t) (symbol & 0xF);
-        int8_t num_zeros = (int8_t) (symbol >> 4);
+        int8_t magnitude = (symbol & 0xF);
+        int8_t num_zeros = (symbol >> 4);
         while (num_zeros > 0) {
 
             block[cpt] = 0;
@@ -68,10 +69,11 @@ int16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  in
         int16_t value = 0;
 
         int8_t current_magnitude =  magnitude;
+      
         if(current_magnitude > 0) {
             while (current_magnitude > 0) {
                 bit = read_bit(d->byte, d->num_bit);
-                value = (int16_t) ((value << 1) + bit);
+                value = ((value << 1) + bit);
 
                 d->num_bit++;
                 if (d->num_bit == 8) {
@@ -82,7 +84,7 @@ int16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  in
             }
 
             if ((value & (1 << (magnitude - 1))) == 0) {
-                value +=(int16_t) (-(1 << magnitude) + 1);
+                value +=(-(1 << magnitude) + 1);
             }
 
             block[cpt] = value;
@@ -93,11 +95,11 @@ int16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  in
             block[cpt] =0;
             cpt ++;
         }
-        printf("symbole %x, magnitude = %x, value = %x , num_zero %d, cpt = %d\n",symbol,magnitude,value,symbol >> 4,cpt );
+        
+        printf("symbole %x\n",symbol);
+      
         current_cel = current_dht->racine_huffman;
     }
-    for(int i =0; i < 64; i++){
-        printf("%hx ", block[i]);
-    }
+   
     return block;
 }

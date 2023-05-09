@@ -7,36 +7,32 @@ typedef	unsigned char BYTE;
 struct data{
     FILE *file;
     BYTE byte;
-    int num_bit;
+    int8_t num_bit;
     // DQT
-    int * quantization_precision;
-    int ** quantization_table_read;
+    int8_t * quantization_precision;
+    int16_t ** quantization_table_read;
     // SOF0
-    int sample_precision;
-    int image_height;
-    int image_width;
-    int nb_of_component;
+    int16_t sample_precision;
+    int16_t image_height;
+    int16_t image_width;
+    int8_t nb_of_component;
     struct component* list_component;
     // DHT
-    int nb_ac;
-    int nb_dc;
     struct dht_ac_dc* list_dc;
     struct dht_ac_dc* list_ac;
     // SOS
-    int nb_component_scan;
+    int16_t nb_component_scan;
     struct scan_component* list_scan_components;
-    int **decoded_blocks;
+    int16_t **decoded_blocks;
 
 };
 
 struct dht_ac_dc{
-    int table_type;// 0 = AC, 1 ==DC
-    int table_index;
-    int nb_symbols;
-    int nb_code[16];
+    int8_t table_type;// 0 = AC, 1 ==DC
+    //int table_index;
+    int16_t nb_symbols;
+    int8_t nb_code[16];
     BYTE *huff_values;
-    int *huff_code;
-    int *huff_length;
     struct cellule_huffman *racine_huffman;
 };
 
@@ -47,16 +43,15 @@ struct cellule_huffman {
 };
 
 struct component{
-    int id;
-    int sampling_horizontal;
-    int sampling_vertical;
-    int quantization_table_index;
+    int8_t sampling_horizontal;
+    int8_t sampling_vertical;
+    int8_t quantization_table_index;
 };
 
 struct scan_component {
-    int scan_component_index;
-    int associated_dc_huffman_table_index;
-    int associated_ac_huffman_table_index;
+    int16_t scan_component_index;
+    int8_t associated_dc_huffman_table_index;
+    int8_t associated_ac_huffman_table_index;
 };
 
 
