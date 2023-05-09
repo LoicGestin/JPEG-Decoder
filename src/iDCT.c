@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "../include/iDCT.h"
+
 
 uint8_t **iDCT(int **phi){
     uint8_t **S=malloc(8*sizeof(uint8_t*));

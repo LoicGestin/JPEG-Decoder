@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "../include/upsampling.h"
+
 
 // nb bloc horizontaux multpliés par 2
 void sur_ech_h(uint8_t *Cb, uint8_t *Cr, int largeur, int hauteur){

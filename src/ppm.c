@@ -2,10 +2,11 @@
 #include <stdio.h>
 #include <string.h>
 
-void create_pgm(char * file_name,  int **nuance, int width, int height){
-    FILE *pgm = fopen(file_name, "w");
-    if(pgm == NULL)
-    {
+#include "../include/ppm.h"
+
+void create_pgm(char *file_name, uint8_t **nuance, int width, int height) {
+    FILE *pgm = fopen(file_name, "wb");
+    if (pgm == NULL) {
         printf("Unable to create pgm file.\n");
         exit(EXIT_FAILURE);
     }
@@ -14,17 +15,13 @@ void create_pgm(char * file_name,  int **nuance, int width, int height){
     fprintf(pgm, "255\n");
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            int pixel = nuance[i][j];
-            if (pixel < 0) {
-                pixel = 0;
-            } else if (pixel > 255) {
-                pixel = 255;
-            }
-            fputc(pixel, pgm);
+            uint8_t pixel = nuance[i][j];
+            fwrite(&pixel, 1, 1, pgm);
         }
     }
     fclose(pgm);
 }
+
 void create_ppm(char * file_name, const int * R, const int * G, const int * B, int width, int height){
     FILE *ppm = fopen(file_name, "w");
     if(ppm == NULL)
@@ -49,25 +46,4 @@ void create_ppm(char * file_name, const int * R, const int * G, const int * B, i
 
     }
     fclose(ppm);
-}
-int main(int argc, char **argv)
-{
-    int * nuance = malloc(sizeof(int) * 10000);
-    for(int i = 0; i < 10000; i++){
-        nuance[i] = i * 52 % 255;
-    }
-    int * R = malloc(sizeof(int) * 10000);
-    int * G = malloc(sizeof(int) * 10000);
-    int * B = malloc(sizeof(int) * 10000);
-
-    for(int i = 0; i < 10000; i++){
-        R[i] =  255;
-        G[i] = 0;
-        B[i] = 255;
-    }
-
-    create_pgm("test.pgm",nuance,100,100);
-    create_ppm("test.ppm",R,G,B,100,100);
-    /* On se congratule. */
-    return EXIT_SUCCESS;
 }

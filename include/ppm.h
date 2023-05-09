@@ -3,6 +3,6 @@
 
 void create_ppm(char * file_name, const int * R, const int * G, const int * B, int width, int height);
 
-void create_pgm(char * file_name, const int * nuance, int width, int height);
+void create_pgm(char *file_name, uint8_t **nuance, int width, int height);
 
 #endif /* _PPM_H_*/
