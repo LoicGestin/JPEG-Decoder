@@ -157,13 +157,11 @@ void init_blocks(struct data *d) {
         d->decoded_blocks[i] = malloc(sizeof(int ) * 64);
     }
 }
-
 int read_bit(BYTE byte, int num_bit){
     //printf("byte %x  : numéro %d = %d\n", byte,num_bit,(byte >> (num_bit )) & 1);
     return (byte >> ( 7 - num_bit )) & 1 ;
 }
-
-uint16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  int16_t * block){
+int16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  int16_t * block){
     struct dht_ac_dc *current_dht = table_type ?&d->list_dc[index] : &d->list_ac[index];
 
 
@@ -171,7 +169,7 @@ uint16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  i
         fread(&d->byte, 1, 1, file);
         d->num_bit = 0;
     }
-    printf("byte = %x\n", d->byte);
+    //printf("byte = %x\n", d->byte);
 
     int bit;
 
@@ -197,7 +195,8 @@ uint16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  i
         if(current_cel->symbol == 0xff){
             printf("ERORR");
         }
-        BYTE symbol = current_cel->symbol;
+        int8_t symbol =(int8_t) current_cel->symbol;
+
         if(symbol == 0){
             while(cpt != 64){
 
@@ -205,21 +204,21 @@ uint16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  i
                 cpt ++;
             }
         }
-        int magnitude = symbol & 0xF;
-        int num_zeros = symbol >> 4;
+        int8_t magnitude = (int8_t) (symbol & 0xF);
+        int8_t num_zeros = (int8_t) (symbol >> 4);
         while (num_zeros > 0) {
 
             block[cpt] = 0;
             num_zeros--;
             cpt ++;
         }
-        int value = 0;
+        int16_t value = 0;
 
-        int current_magnitude = magnitude;
+        int8_t current_magnitude =  magnitude;
         if(current_magnitude > 0) {
             while (current_magnitude > 0) {
                 bit = read_bit(d->byte, d->num_bit);
-                value = (value << 1) + bit;
+                value = (int16_t) ((value << 1) + bit);
 
                 d->num_bit++;
                 if (d->num_bit == 8) {
@@ -230,7 +229,7 @@ uint16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  i
             }
 
             if ((value & (1 << (magnitude - 1))) == 0) {
-                value += -(1 << magnitude) + 1;
+                value +=(int16_t) (-(1 << magnitude) + 1);
             }
 
             block[cpt] = value;
@@ -245,11 +244,10 @@ uint16_t * decode_ac_dc(struct data *d, int index, int table_type,FILE* file,  i
         current_cel = current_dht->racine_huffman;
     }
     for(int i =0; i < 64; i++){
-        printf("%x ", block[i]);
+        printf("%hx ", block[i]);
     }
     return block;
 }
-
 struct data* decode_entete(char * path){
     FILE* file = fopen(path, "rb");
 
@@ -391,7 +389,7 @@ struct data* decode_entete(char * path){
                     char initial_path[1] = "";
                     display_huffman_tree(current_dht->racine_huffman, initial_path);
                     printf("\n");
-                    init_blocks(d);
+
 
                     break;
                 }
@@ -442,13 +440,11 @@ int * quantification_inverse(struct data *d, int index,  const int16_t *frequent
     int *quantification = d->quantization_table_read[index];
     int *table = malloc(64*sizeof(int*));
     for(int i=0; i<64; i++){
-        table[i]= frequentiel[i]/quantification[i];
+        table[i]= frequentiel[i]*quantification[i];
     }
 
     return table;
 }
-
-
 int ** zig_zag(const int *tab){
 
 
@@ -527,22 +523,26 @@ int ** zig_zag(const int *tab){
 uint8_t iDCT(int x, int y, int **phi) {
     int n = 8;
 
-    float dep = (1 / pow(2*n, 1/2));
-    float t1 = (1/2) * phi[0][0];
+    double dep = (1 / pow(2*n, 1/2));
+
+    float t1 = (1/2) * (int16_t ) phi[0][0];
 
     float t2 = 0.0;
     for (int mu = 1; mu<n; mu++){
+
         t2 += (1 / pow(2*n, 1/2)) * cosf(((2*y+1)*mu*M_PI)/(2*n)) * phi[0][mu];
     }
 
     float t3 = 0.0;
     for (int lambda = 1; lambda<n; lambda++){
+
         t3 += (1 / pow(2*n, 1/2)) * cosf(((2*x+1)*lambda*M_PI)/(2*n)) * phi[lambda][0];
     }
 
     float t4 = 0.0;
     for (int lambda = 1; lambda<n; lambda++){
         for (int mu = 1; mu<n; mu++){
+
             t4 += cosf(((2*y+1)*mu*M_PI)/(2*n)) * cosf(((2*x+1)*lambda*M_PI)/(2*n)) * phi[lambda][mu];
         }
     }
@@ -581,7 +581,7 @@ void create_pgm(char *file_name, uint8_t **nuance, int width, int height) {
 }
 int main(int argc, char **argv)
 {
-    struct data *d = decode_entete("C:/Users/loicg/CLionProjects/team19/images/invader.jpeg");
+    struct data *d = decode_entete("C:/Users/loicg/CLionProjects/team19/images/poupoupidou_bw.jpg");
 
     printf("%x \n", d->byte);
     int16_t *block = malloc(sizeof (int16_t) * 64);
@@ -592,13 +592,13 @@ int main(int argc, char **argv)
     int * data = quantification_inverse(d,0,block);
 
     for(int i =0; i < 64; i++){
-        printf("%x ", data[i]);
+        printf("%hx ", data[i]);
     }
     printf("\n\n");
     int ** matrice = zig_zag(data);
     for(int i =0; i < 8; i++){
         for(int j =0; j < 8; j++){
-            printf("%x ", matrice[i][j]);
+            printf("%hx ", matrice[i][j]);
         }
         printf("\n");
     }
