@@ -8,6 +8,7 @@ struct data{
     FILE *file;
     BYTE byte;
     int8_t num_bit;
+    int8_t find_ff;
     // DQT
     int8_t * quantization_precision;
     int16_t ** quantization_table_read;

@@ -3,13 +3,7 @@
 
 #include "../include/extract_bloc.h"
 
-void init_blocks(struct data *d) {
-    int32_t nb_block = d->image_height * d->image_width;
-    d->decoded_blocks = malloc( sizeof(int16_t ) * nb_block );
-    for (int32_t i = 0; i < nb_block; i++) {
-        d->decoded_blocks[i] = malloc(sizeof(int16_t ) * 64);
-    }
-}
+
 int8_t read_bit(BYTE byte, int8_t num_bit){
     //printf("byte %x  : numéro %d = %d\n", byte,num_bit,(byte >> (num_bit )) & 1);
     return (byte >> ( 7 - num_bit )) & 1 ;
@@ -39,6 +33,13 @@ int16_t * decode_ac_dc(struct data *d, int8_t index, int8_t table_type,FILE* fil
             current_cel = bit ? current_cel->right : current_cel->left;
             if(d->num_bit == 7){
                 fread(&d->byte, 1, 1, file);
+                if(d->find_ff){
+                    fread(&d->byte, 1, 1, file);
+                    d->find_ff = 0;
+                }
+                if(d->byte == 0xFF){
+                    d->find_ff = 1;
+                }
                 d->num_bit =0;
             }
             else{
@@ -49,7 +50,7 @@ int16_t * decode_ac_dc(struct data *d, int8_t index, int8_t table_type,FILE* fil
             printf("ERORR");
         }
      
-        int8_t symbol =current_cel->symbol;
+        int16_t symbol =current_cel->symbol;
 
         if(symbol == 0){
             while(cpt != 64){
@@ -78,6 +79,13 @@ int16_t * decode_ac_dc(struct data *d, int8_t index, int8_t table_type,FILE* fil
                 d->num_bit++;
                 if (d->num_bit == 8) {
                     fread(&d->byte, 1, 1, file);
+                    if(d->find_ff){
+                        fread(&d->byte, 1, 1, file);
+                        d->find_ff = 0;
+                    }
+                    if(d->byte == 0xFF){
+                        d->find_ff = 1;
+                    }
                     d->num_bit = 0;
                 }
                 current_magnitude--;

@@ -11,6 +11,7 @@
 
 struct data* init_data() {
     struct data* data = malloc(sizeof(struct data));
+    data->find_ff = 0; 
 
     // DQT
     data->quantization_precision =  malloc(4 * sizeof(int8_t));
@@ -98,8 +99,8 @@ struct data* decode_entete(char * path){
                         printf("%02x ", data[i]);
                      }
                     BYTE precision = data[0];
-                    BYTE height = (data[1] << 8) | data[2];
-                    BYTE width = (data[3] << 8) | data[4];
+                    int16_t height = (data[1] << 8) | data[2];
+                    int16_t width = (data[3] << 8) | data[4];
                     printf("   sample precision %d\n", precision);
                     printf("   image height %d\n", height);
                     printf("   image width %d\n", width);
