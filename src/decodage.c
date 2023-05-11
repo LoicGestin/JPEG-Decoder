@@ -16,15 +16,15 @@
 
 int main(int argc, char **argv)
 {
-    struct data *d = decode_entete("../images/gris.jpg");
+    struct data *d = decode_entete("../images/bisou.jpeg");
 
     printf("%x \n", d->byte);
     int16_t cpt =0;
-    int16_t nb_block_ligne = d->image_width/ 8;
-    int16_t nb_block_colonne = d->image_height/8;
+    int16_t nb_block_ligne = d->image_width / 8 + ((d->image_width % 8 != 0) ? 1 : 0);
+    int16_t nb_block_colonne = d->image_height / 8 + ((d->image_height % 8 != 0) ? 1 : 0);
     uint8_t ***mat=malloc(nb_block_ligne*sizeof(uint8_t **));
     int16_t precDC = 0;
-    FILE *test_invaders = fopen("gris.pgm", "wb");
+    FILE *test_invaders = fopen("bisou.pgm", "wb");
     create_pgm_header(test_invaders, d->image_width, d->image_height);
     for(int16_t k = 0; k < nb_block_colonne; k++){
         for (int16_t i = 0; i < nb_block_ligne; i++){
@@ -65,8 +65,10 @@ int main(int argc, char **argv)
             mat[i]=pixel;
             free(block);
             printf("%d\n", cpt);
+            printf("%d\n", nb_block_ligne);
+            printf("%d\n", nb_block_colonne);
         }
-        create_pgm(test_invaders ,mat, d->image_width);
+        create_pgm(test_invaders ,mat, d->image_width, d->image_height);
     }
     fclose(test_invaders);
 

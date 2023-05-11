@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <math.h>
+
 
 #include "../include/ppm.h"
 
@@ -16,13 +18,36 @@ void create_pgm_header(FILE *file_name, int16_t width, int16_t height) {
 
 }
 
-void create_pgm(FILE *file_name, uint8_t ***nuance, int16_t width) {
-    int16_t taille_tab = width/8;
-    for (int8_t i = 0; i < 8; i++) {
-        for (int16_t k = 0; k < taille_tab; k++) {
-            for (int8_t j = 0; j < 8; j++){
-                uint8_t pixel = nuance[k][i][j];
-                fwrite(&pixel, 1, 1, file_name);
+void create_pgm(FILE *file_name, uint8_t ***nuance, int16_t width, int16_t height) {
+    int16_t nb_pixels_w = 0;
+    int16_t nb_pixels_h = 0;
+
+    int16_t taille_tab_h = width / 8 + ((width % 8 != 0) ? 1 : 0);
+    if (width % 8 != 0 ||  height % 8 != 0 ){
+        for (int8_t i = 0; i < 8; i++){
+            for (int16_t k = 0; k < taille_tab_h; k++){
+                for (int8_t j = 0; j < 8; j++){
+                    if(nb_pixels_w >= width || nb_pixels_h >= height){
+                        nb_pixels_w++;
+                    }
+                    else{
+                        uint8_t pixel = nuance[k][i][j];
+                        fwrite(&pixel, 1, 1, file_name);
+                        nb_pixels_w++;
+                    }
+                }
+            }
+            nb_pixels_w = 0;
+            nb_pixels_h++;
+        }
+    }
+    else{
+        for (int8_t i = 0; i < 8; i++) {
+            for (int16_t k = 0; k < taille_tab_h; k++) {
+                for (int8_t j = 0; j < 8; j++){
+                    uint8_t pixel = nuance[k][i][j];
+                    fwrite(&pixel, 1, 1, file_name);
+                }
             }
         }
     }
