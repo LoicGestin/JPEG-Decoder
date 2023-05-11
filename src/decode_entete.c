@@ -63,7 +63,7 @@ struct data* decode_entete(char * path){
 
             fread(&msb, 1, 1, file);
             fread(&lsb, 1, 1, file);
-            printf("msb : %x,  lsb : %x : \n", msb,lsb);
+            
 
             marker_length = (msb << 8) | lsb;
 
@@ -127,6 +127,7 @@ struct data* decode_entete(char * path){
 
                 }
                 case (0xC4): {
+                    printf("salut");
                     printf("[DHT] length %d bytes\n", marker_length);
                     int8_t type = ((data[0] >> 4) & 0x01) == 0x00;
                     BYTE index = data[0] & 0x0F;
@@ -142,8 +143,12 @@ struct data* decode_entete(char * path){
                     if (total_symbols > 256) {
                         printf("ERREUR NB TOTAL SYMBOLE > 256");
                     }
+
+                   
                     printf("   total nb of Huffman symbols %d\n", total_symbols);
+            
                     struct dht_ac_dc *current_dht = NULL;
+                   
                     if (type) {
                         current_dht = &d->list_dc[index];
                     } else {
@@ -152,17 +157,21 @@ struct data* decode_entete(char * path){
                     current_dht->table_type = type;
 
 
-        
+                    
                     current_dht->nb_symbols = total_symbols;
                     for (int8_t i = 0; i < 16; i++) {
                         current_dht->nb_code[i] = nb_code[i];
 
                     }
+                    printf("SYMBOL : %02x\n", total_symbols);
                     current_dht->huff_values = malloc(total_symbols * sizeof(BYTE));
-                    for (int8_t i = 0, offset = 17; i < total_symbols; i++, offset++) {
+                    for (int16_t i = 0, offset = 17; i < total_symbols; i++, offset++) {
                         current_dht->huff_values[i] = data[offset];
                     }
+                    
                     decode_huffman(d, index, type);
+
+                    printf("SYMBOL gr: %02x\n", total_symbols);
                     /*
                     for (int i = 0; i < total_symbols; i++) {
                         printf("   path: %s symbol: %x\n",
@@ -187,7 +196,7 @@ struct data* decode_entete(char * path){
                         printf("     associated to component of id %d (frame index %d)\n", ic_composante, i);
                         BYTE id_DC_AC = data[2 + (2 * i)];
                         printf("     associated to DC Huffman table of index %d\n", id_DC_AC >> 4);
-                        printf("     associated to AC Huffman table of index %d\n", id_DC_AC & 0xF0);
+                        printf("     associated to AC Huffman table of index %d\n", id_DC_AC & 0xF);
                         d->list_scan_components[i].scan_component_index = ic_composante;
                         d->list_scan_components[i].associated_dc_huffman_table_index = id_DC_AC >> 4;
                         d->list_scan_components[i].associated_ac_huffman_table_index = id_DC_AC & 0xF;

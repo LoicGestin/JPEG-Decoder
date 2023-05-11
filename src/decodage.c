@@ -8,16 +8,15 @@
 #include "../include/huffman.h"
 #include "../include/extract_bloc.h"
 #include "../include/iDCT.h"
-#include "../src/couleur_/couleur.h"
+#include "../include/couleur.h"
 #include "../include/ppm.h"
 #include "../include/upsampling.h"
 #include "../include/quantification_inverse.h"
 #include "../include/zig_zag.h"
 
 
-int main(int argc, char **argv)
-{
-    struct data *d = decode_entete("../images/bisou.jpeg");
+int main(int argc, char **argv){
+    struct data *d = decode_entete("../images/poupoupidou.jpg");
 
     printf("%x \n", d->byte);
     int16_t cpt =0;
@@ -26,7 +25,7 @@ int main(int argc, char **argv)
     int16_t precDC = 0;
     int16_t precDC_Cb = 0;
     int16_t precDC_Cr = 0;
-    FILE *test_invaders = fopen("bisou.pgm", "wb");
+    FILE *test_invaders = fopen("poupoupidou.ppm", "wb");
     if(d->nb_component_scan == 1){
         uint8_t ***mat=malloc(nb_block_ligne*sizeof(uint8_t **));
         create_pgm_header(test_invaders, d->image_width, d->image_height);
@@ -39,6 +38,7 @@ int main(int argc, char **argv)
                 block[0] = block[0] + precDC;
                 precDC = block[0];
                 printf("\n\n");
+
                 int16_t * data = quantification_inverse(d,0,block);
 
                 for(int8_t i = 0; i < 64; i++){
@@ -77,23 +77,49 @@ int main(int argc, char **argv)
         fclose(test_invaders);
 }
 else{
-    struct Tuple *block = malloc(sizeof(struct Tuple));
+    
     create_ppm_header(test_invaders, d->image_width, d->image_height);
+    uint8_t ***red=malloc(nb_block_ligne*sizeof(uint8_t **));
+    uint8_t ***green=malloc(nb_block_ligne*sizeof(uint8_t **));
+    uint8_t ***blue=malloc(nb_block_ligne*sizeof(uint8_t **));
     for(int16_t k = 0; k < nb_block_colonne; k++){
+        
         for (int16_t i = 0; i < nb_block_ligne; i++){
             int16_t *block_Y = malloc(sizeof (int16_t) * 64);
+            int16_t *block_Y2 = malloc(sizeof (int16_t) * 64);
             int16_t *block_Cb = malloc(sizeof (int16_t) * 64);
             int16_t *block_Cr = malloc(sizeof (int16_t) * 64);
 
             decode_ac_dc(d,0,1,d->file,block_Y);
             decode_ac_dc(d,0,0,d->file,block_Y);
+
+            for(int8_t i = 0; i < 64; i++){
+                printf("%hx ", block_Y[i]);
+            }
+            decode_ac_dc(d,0,1,d->file,block_Y2);
+            decode_ac_dc(d,0,0,d->file,block_Y2);
+
+            for(int8_t i = 0; i < 64; i++){
+                printf("%hx ", block_Y2[i]);
+            }
+
             decode_ac_dc(d,1,1,d->file,block_Cb);
             decode_ac_dc(d,1,0,d->file,block_Cb);
-            decode_ac_dc(d,2,1,d->file,block_Cr);
-            decode_ac_dc(d,2,0,d->file,block_Cr);
 
-            block_Y[0] = block_Y[0] + precDC;
-            precDC = block_Y[0];
+            for(int8_t i = 0; i < 64; i++){
+                printf("%hx ", block_Cb[i]);
+            }
+
+
+            decode_ac_dc(d,1,1,d->file,block_Cr);
+            decode_ac_dc(d,1,0,d->file,block_Cr);
+
+            for(int8_t i = 0; i < 64; i++){
+                printf("%hx ", block_Cr[i]);
+            }
+
+
+
             block_Y[0] = block_Y[0] + precDC;
             precDC = block_Y[0];
             block_Cb[0] = block_Cb[0] + precDC_Cb;
@@ -113,53 +139,20 @@ else{
             uint8_t **pixel_Cb= iDCT(matrice_Cb);
             uint8_t **pixel_Cr= iDCT(matrice_Cr);
 
-            *block = YCbCr_to_RGB(pixel_Y, pixel_Cb, pixel_Cr);
+            red[i] = YCbCr_to_R(pixel_Y, pixel_Cb, pixel_Cr);
+            green[i] = YCbCr_to_R(pixel_Y, pixel_Cb, pixel_Cr);
+            blue[i] = YCbCr_to_R(pixel_Y, pixel_Cb, pixel_Cr);
+
+            
 
         }
-        create_ppm(test_invaders, block->R, block->G, block->B, d->image_width, d->image_height);
+        create_ppm(test_invaders, red, green , blue, d->image_width, d->image_height);
     } 
     fclose(test_invaders);       
 
 }
     
 
-
-
-    /*
-    for(int8_t i=0; i < nb_block; i++){
-        int16_t *block = malloc(sizeof (int16_t) * 64);
-        //fread(&d->byte, 1, 1, d->file);
-        decode_ac_dc(d,0,1,d->file,block);
-        decode_ac_dc(d,0,0,d->file,block);
-        printf("\n\n");
-        int16_t * data = quantification_inverse(d,0,block);
-
-        for(int8_t i =0; i < 64; i++){
-            printf("%hx ", data[i]);
-        }
-        printf("\n\n");
-        int16_t ** matrice = zig_zag(data);
-        for(int8_t k =0; k < 8; k++){
-            for(int8_t j =0; j < 8; j++){
-                printf("%hx ", matrice[k][j]);
-            }
-            printf("\n");
-        }
-        printf("\n\n");
-
-        
-        printf("\n");
-        uint8_t **pixel= iDCT(matrice);
-
-
-        for(int8_t k =0; k < 8; k++){
-            for(int8_t j =0; j < 8; j++){
-                printf("%02x ", pixel[k][j]);
-            }
-            printf("\n");
-        }
-         create_pgm("test_invaders.pgm",pixel,8,8);
-    }*/
    
 
 

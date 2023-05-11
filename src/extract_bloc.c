@@ -104,7 +104,7 @@ int16_t * decode_ac_dc(struct data *d, int8_t index, int8_t table_type,FILE* fil
             cpt ++;
         }
         
-        printf("symbole %x\n",symbol);
+        printf("symbole %x, BYTE : %x\n",symbol,d->byte);
       
         current_cel = current_dht->racine_huffman;
     }

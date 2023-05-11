@@ -54,20 +54,19 @@ void create_pgm(FILE *file_name, uint8_t ***nuance, int16_t width, int16_t heigh
 }
 
 void create_ppm_header(FILE *file_name, int16_t width, int16_t height) {
-    FILE *ppm = fopen(file_name, "w");
-    if(ppm == NULL)
+    if(file_name == NULL)
     {
         printf("Unable to create ppm file.\n");
         exit(EXIT_FAILURE);
     }
-    fprintf(ppm, "P6\n");
-    fprintf(ppm, "%d %d\n", width, height);
-    fprintf(ppm, "255\n");
+    fprintf(file_name, "P6\n");
+    fprintf(file_name, "%d %d\n", width, height);
+    fprintf(file_name, "255\n");
 
 }
 
-void create_ppm(FILE * file_name, const uint8_t ** R, const uint8_t ** G, const uint8_t ** B, int16_t width, int16_t height){
-   int16_t nb_pixels_w = 0;
+void create_ppm(FILE * file_name, const uint8_t *** R, const uint8_t *** G, const uint8_t *** B, int16_t width, int16_t height){
+    int16_t nb_pixels_w = 0;
     int16_t nb_pixels_h = 0;
 
     int16_t taille_tab_h = width / 8 + ((width % 8 != 0) ? 1 : 0);
@@ -79,9 +78,9 @@ void create_ppm(FILE * file_name, const uint8_t ** R, const uint8_t ** G, const 
                         nb_pixels_w++;
                     }
                     else{
-                        uint8_t red_pixel = R[i][j];
-                        uint8_t green_pixel = G[i][j];
-                        uint8_t blue_pixel = B[i][j];
+                        uint8_t red_pixel = R[k][i][j];
+                        uint8_t green_pixel = G[k][i][j];
+                        uint8_t blue_pixel = B[k][i][j];
 
                         fputc(red_pixel, file_name);
                         fputc(green_pixel, file_name);
@@ -98,9 +97,9 @@ void create_ppm(FILE * file_name, const uint8_t ** R, const uint8_t ** G, const 
         for (int8_t i = 0; i < 8; i++) {
             for (int16_t k = 0; k < taille_tab_h; k++) {
                 for (int8_t j = 0; j < 8; j++){
-                    uint8_t red_pixel = R[i][j];
-                    uint8_t green_pixel = G[i][j];
-                    uint8_t blue_pixel = B[i][j];
+                    uint8_t red_pixel = R[k][i][j];
+                    uint8_t green_pixel = G[k][i][j];
+                    uint8_t blue_pixel = B[k][i][j];
 
                     fputc(red_pixel, file_name);
                     fputc(green_pixel, file_name);
