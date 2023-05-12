@@ -8,7 +8,7 @@
 #include "../include/huffman.h"
 #include "../include/extract_bloc.h"
 #include "../include/iDCT.h"
-#include "../include/couleur.h"
+#include "../include/couleur_matrice.h"
 #include "../include/ppm.h"
 #include "../include/upsampling.h"
 #include "../include/quantification_inverse.h"
@@ -90,6 +90,11 @@ else{
             int16_t *block_Cb = malloc(sizeof (int16_t) * 64);
             int16_t *block_Cr = malloc(sizeof (int16_t) * 64);
 
+            struct dht_ac_dc *current_dht = &d->list_dc[0];
+            
+            //display_huffman_tree(current_dht->racine_huffman,"");
+             struct dht_ac_dc *current_dht2 = &d->list_ac[0];
+            //display_huffman_tree(current_dht2->racine_huffman,"");
             decode_ac_dc(d,0,1,d->file,block_Y);
             decode_ac_dc(d,0,0,d->file,block_Y);
 

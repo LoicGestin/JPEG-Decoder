@@ -24,6 +24,29 @@ void insert_code_huffman(struct cellule_huffman **c,int16_t value, int16_t lengt
         }
     }
 }
+void display_huffman_tree(struct cellule_huffman* c, char* path) {
+    if (c == NULL) {
+        return;
+    }
+
+    if (c->right == NULL && c->left == NULL && strlen(path) > 0) {
+        printf("   path: %s, symbol: %x\n", path,c->symbol);
+    } else {
+        char* left_path = malloc(strlen(path)+  1);
+        strcpy(left_path, path);
+        strcat(left_path, "0");
+
+        char* right_path = malloc(strlen(path)+ 1);
+        strcpy(right_path, path);
+        strcat(right_path, "1");
+
+        display_huffman_tree(c->left, left_path);
+        display_huffman_tree(c->right, right_path);
+
+       // free(left_path);
+       // free(right_path);
+    }
+}
 
 void decode_huffman(struct data* d, int16_t index, int8_t table_type){
 

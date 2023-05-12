@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "../include/couleur.h"
+#include "../include/couleur_matrice.h"
 
 uint8_t **YCbCr_to_R(uint8_t **Y, uint8_t **Cb, uint8_t **Cr){
     uint8_t **R=malloc(8*sizeof(uint8_t *));

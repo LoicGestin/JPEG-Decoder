@@ -10,8 +10,7 @@ int8_t read_bit(BYTE byte, int8_t num_bit){
 }
 int16_t * decode_ac_dc(struct data *d, int8_t index, int8_t table_type,FILE* file,  int16_t * block){
     struct dht_ac_dc *current_dht = table_type ?&d->list_dc[index] : &d->list_ac[index];
-
-
+   
     if(d->num_bit == -1) {
         fread(&d->byte, 1, 1, file);
         d->num_bit = 0;
@@ -30,6 +29,7 @@ int16_t * decode_ac_dc(struct data *d, int8_t index, int8_t table_type,FILE* fil
         // JE SUIS REST2 BLOQU2 2 PUTAIN DHEURE CAR J4AVAIS MIS UN && !!!!!!!!!!!!!!!!!!!!!!!!
         while(current_cel->right != NULL || current_cel->left != NULL){
             bit = read_bit(d->byte,d->num_bit);
+            //printf("Byte = %x  : %d %d %d %d %d %d %d %d\n",d->byte,read_bit(d->byte,0),read_bit(d->byte,1),read_bit(d->byte,2),read_bit(d->byte,3),read_bit(d->byte,4),read_bit(d->byte,5),read_bit(d->byte,6),read_bit(d->byte,7));
             current_cel = bit ? current_cel->right : current_cel->left;
             if(d->num_bit == 7){
                 fread(&d->byte, 1, 1, file);
@@ -104,10 +104,10 @@ int16_t * decode_ac_dc(struct data *d, int8_t index, int8_t table_type,FILE* fil
             cpt ++;
         }
         
-        printf("symbole %x, BYTE : %x\n",symbol,d->byte);
+        printf("%x(%x) ",symbol,d->byte);
       
         current_cel = current_dht->racine_huffman;
     }
-   
+      printf(" \n\n\n");
     return block;
 }

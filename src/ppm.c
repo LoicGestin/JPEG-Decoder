@@ -65,7 +65,7 @@ void create_ppm_header(FILE *file_name, int16_t width, int16_t height) {
 
 }
 
-void create_ppm(FILE * file_name, const uint8_t *** R, const uint8_t *** G, const uint8_t *** B, int16_t width, int16_t height){
+void create_ppm(FILE * file_name,  uint8_t *** R,  uint8_t *** G,  uint8_t *** B, int16_t width, int16_t height){
     int16_t nb_pixels_w = 0;
     int16_t nb_pixels_h = 0;
 
