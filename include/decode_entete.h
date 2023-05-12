@@ -33,12 +33,12 @@ struct dht_ac_dc{
     //int table_index;
     int16_t nb_symbols;
     int8_t nb_code[16];
-    BYTE *huff_values;
+    int16_t *huff_values;
     struct cellule_huffman *racine_huffman;
 };
 
 struct cellule_huffman {
-    BYTE symbol;
+    int16_t symbol;
     struct cellule_huffman  *left;
     struct cellule_huffman  *right;
 };

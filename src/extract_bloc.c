@@ -8,7 +8,7 @@ int8_t read_bit(BYTE byte, int8_t num_bit){
     //printf("byte %x  : numéro %d = %d\n", byte,num_bit,(byte >> (num_bit )) & 1);
     return (byte >> ( 7 - num_bit )) & 1 ;
 }
-int16_t * decode_ac_dc(struct data *d, int8_t index, int8_t table_type,FILE* file,  int16_t * block){
+int16_t * decode_ac_dc(struct data *d, int16_t index, int8_t table_type,FILE* file,  int16_t * block){
     struct dht_ac_dc *current_dht = table_type ?&d->list_dc[index] : &d->list_ac[index];
    
     if(d->num_bit == -1) {
@@ -104,10 +104,10 @@ int16_t * decode_ac_dc(struct data *d, int8_t index, int8_t table_type,FILE* fil
             cpt ++;
         }
         
-        printf("%x(%x) ",symbol,d->byte);
+        //printf("%x(%x) ",symbol,d->byte);
       
         current_cel = current_dht->racine_huffman;
     }
-      printf(" \n\n\n");
+      //printf(" \n\n\n");
     return block;
 }

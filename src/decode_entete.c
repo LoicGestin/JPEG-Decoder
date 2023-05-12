@@ -81,7 +81,7 @@ struct data* decode_entete(char * path){
                 case (0xDB): {
                     printf("[DQT] length %d bytes\n", marker_length);
                     BYTE index = data[0] & 0x0F;
-                    BYTE precision = data[0] == 0x00 ? 0x08 : 0x10;
+                    BYTE precision = (data[0] >> 4) == 0x00 ? 0x08 : 0x10;
                     printf("   quantization table index %d\n", index);
                     printf("   quantization table precision %d bits\n", precision);
                     printf("   quantization table read (64 bytes)\n\n");
@@ -127,19 +127,19 @@ struct data* decode_entete(char * path){
 
                 }
                 case (0xC4): {
-                    printf("salut");
                     printf("[DHT] length %d bytes\n", marker_length);
                     int8_t type = ((data[0] >> 4) & 0x01) == 0x00;
-                    BYTE index = data[0] & 0x0F;
+                    int16_t index = data[0] & 0x0F;
                     printf("   Huffman table type: %s\n", type ? "DC" : "AC");
                     printf("   Huffman table index : %d\n", index);
 
-                    int total_symbols = 0;
+                    int16_t total_symbols = 0;
                     BYTE nb_code[16];
                     for (int8_t i = 0; i < 16; i++) {
                         nb_code[i] = data[i + 1];
                         total_symbols += data[i + 1];
                     }
+
                     if (total_symbols > 256) {
                         printf("ERREUR NB TOTAL SYMBOLE > 256");
                     }
@@ -164,14 +164,13 @@ struct data* decode_entete(char * path){
 
                     }
                     printf("SYMBOL : %02x\n", total_symbols);
-                    current_dht->huff_values = malloc(total_symbols * sizeof(BYTE));
+                    current_dht->huff_values = malloc(total_symbols * sizeof(int16_t));
                     for (int16_t i = 0, offset = 17; i < total_symbols; i++, offset++) {
                         current_dht->huff_values[i] = data[offset];
                     }
                     
-                    decode_huffman(d, index, type);
+                    decode_huffman(current_dht, index, type);
 
-                    printf("SYMBOL gr: %02x\n", total_symbols);
                     /*
                     for (int i = 0; i < total_symbols; i++) {
                         printf("   path: %s symbol: %x\n",
