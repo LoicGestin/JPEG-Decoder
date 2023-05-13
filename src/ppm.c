@@ -65,9 +65,11 @@ void create_ppm_header(FILE *file_name, int16_t width, int16_t height) {
 
 }
 
+
 void create_ppm(FILE * file_name,  uint8_t *** R,  uint8_t *** G,  uint8_t *** B, int16_t width, int16_t height){
     int16_t nb_pixels_w = 0;
     int16_t nb_pixels_h = 0;
+    int32_t nb_pixels = 0;
 
     int16_t taille_tab_h = width / 8 + ((width % 8 != 0) ? 1 : 0);
     if (width % 8 != 0 ||  height % 8 != 0 ){
@@ -86,6 +88,7 @@ void create_ppm(FILE * file_name,  uint8_t *** R,  uint8_t *** G,  uint8_t *** B
                         fputc(green_pixel, file_name);
                         fputc(blue_pixel, file_name);
                         nb_pixels_w++;
+                        nb_pixels++;
                     }
                 }
             }
@@ -104,11 +107,11 @@ void create_ppm(FILE * file_name,  uint8_t *** R,  uint8_t *** G,  uint8_t *** B
                     fputc(red_pixel, file_name);
                     fputc(green_pixel, file_name);
                     fputc(blue_pixel, file_name);
+                    nb_pixels++;
                 }
             }
         }
     }
 
-    // test si >0 et <256 ... voir si nécéssaire
-
+    printf("nb pixels : %d\n", nb_pixels_written);
 }
