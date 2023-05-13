@@ -222,9 +222,40 @@ else{
             printf("\n\n");*/
 
             uint8_t **pixel_Cb1 = sur_ech_h_Cb1(pixel_Cb);
-            uint8_t **pixel_Cb2 = sur_ech_h_Cb1(pixel_Cb);
+            /*for(int8_t x = 0; x < 8; x++){
+                for(int8_t j = 0; j < 8; j++){
+                    printf("%hx ", pixel_Cb1[x][j]);
+                }
+                printf("\n");
+            }
+            printf("\n\n");*/
+
+            uint8_t **pixel_Cb2 = sur_ech_h_Cb2(pixel_Cb);
+            /*for(int8_t x = 0; x < 8; x++){
+                for(int8_t j = 0; j < 8; j++){
+                    printf("%hx ", pixel_Cb2[x][j]);
+                }
+                printf("\n");
+            }
+            printf("\n\n");*/
+
             uint8_t **pixel_Cr1 = sur_ech_h_Cb1(pixel_Cr);
-            uint8_t **pixel_Cr2 = sur_ech_h_Cb1(pixel_Cr);
+            /*for(int8_t x = 0; x < 8; x++){
+                for(int8_t j = 0; j < 8; j++){
+                    printf("%hx ", pixel_Cr1[x][j]);
+                }
+                printf("\n");
+            }
+            printf("\n\n");*/
+
+            uint8_t **pixel_Cr2 = sur_ech_h_Cb2(pixel_Cr);
+            /*for(int8_t x = 0; x < 8; x++){
+                for(int8_t j = 0; j < 8; j++){
+                    printf("%hx ", pixel_Cr2[x][j]);
+                }
+                printf("\n");
+            }
+            printf("\n\n");*/
 
             red[1] = YCbCr_to_R(pixel_Y, pixel_Cb1, pixel_Cr1);
             green[1] = YCbCr_to_G(pixel_Y, pixel_Cb1, pixel_Cr1);
