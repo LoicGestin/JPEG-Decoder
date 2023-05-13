@@ -113,5 +113,5 @@ void create_ppm(FILE * file_name,  uint8_t *** R,  uint8_t *** G,  uint8_t *** B
         }
     }
 
-    printf("nb pixels : %d\n", nb_pixels_written);
+    printf("nb pixels : %d\n", nb_pixels);
 }
