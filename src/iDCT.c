@@ -5,6 +5,8 @@
 
 #include "../include/iDCT.h"
 
+#define pi 3.14159265359
+
 uint8_t **iDCT(int16_t **phi){
     uint8_t **S=malloc(8*sizeof(uint8_t*));
     for(int8_t x=0; x<8; x++){
@@ -17,18 +19,18 @@ uint8_t **iDCT(int16_t **phi){
            
             float t2 = 0.0;
             for (int8_t mu = 1; mu<8; mu++){
-                t2 += (float) (cosf(((2*y+1)*mu*M_PI)/(16)) * (float) phi[0][mu])/racine;
+                t2 += (float) (cosf(((2*y+1)*mu*pi)/(16)) * (float) phi[0][mu])/racine;
             }
 
             float t3 = 0.0;
             for (int lambda = 1; lambda<8; lambda++){
-                t3 += ((float) cosf(((2*x+1)*lambda*M_PI)/(16)) *  (float)phi[lambda][0])/racine;
+                t3 += ((float) cosf(((2*x+1)*lambda*pi)/(16)) *  (float)phi[lambda][0])/racine;
             }
 
             float t4 = 0.0;
             for (int8_t lambda = 1; lambda<8; lambda++){
                 for (int8_t mu = 1; mu<8; mu++){
-                    t4 += (float) cosf(((2*y+1)*mu*M_PI)/(16)) * cosf(((2*x+1)*lambda*M_PI)/(16)) *  (float)phi[lambda][mu];
+                    t4 += (float) cosf(((2*y+1)*mu*pi)/(16)) * cosf(((2*x+1)*lambda*pi)/(16)) *  (float)phi[lambda][mu];
                 }
             }
       

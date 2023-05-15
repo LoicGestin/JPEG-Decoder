@@ -66,7 +66,6 @@ void decode_huffman(struct dht_ac_dc *current_dht, int16_t index, int8_t table_t
         for(int16_t j=0; j < current_dht->nb_code[i]; j++){
             //current_dht->huff_code[ind] = value;
             //current_dht->huff_length[ind] = length;
-            printf("huff_value2 : %x \n", current_dht->huff_values[ind]);
             insert_code_huffman(&current_dht->racine_huffman,value,length+1,current_dht->huff_values[ind]);
             value ++;
             ind ++;
