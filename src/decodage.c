@@ -16,7 +16,7 @@
 
 
 int main(int argc, char **argv){
-    struct data *d = decode_entete("../images/biiiiiig.jpg");
+    struct data *d = decode_entete("../images/horizontal.jpg");
 
   
     int16_t cpt =0;
@@ -26,7 +26,7 @@ int main(int argc, char **argv){
     int16_t precDC = 0;
     int16_t precDC_Cb = 0;
     int16_t precDC_Cr = 0;
-    FILE *test_invaders = fopen("biiiiiig.ppm", "wb");
+    FILE *test_invaders = fopen("horizontal.ppm", "wb");
     if(d->nb_component_scan == 1){
         uint8_t ***mat=malloc(nb_block_ligne*sizeof(uint8_t **));
         create_pgm_header(test_invaders, d->image_width, d->image_height);
