@@ -94,10 +94,7 @@ struct data* decode_entete(char * path){
                     break;
                 }
                 case (0xC0): {
-                    printf("[S0FO] length %d bytes\n", marker_length);
-                     for (int8_t i = 0; i < marker_length - 2; i++) {
-                        printf("%02x ", data[i]);
-                     }
+                    printf("[S0FO] length %d bytes\n", marker_length);                   
                     BYTE precision = data[0];
                     int16_t height = (data[1] << 8) | data[2];
                     int16_t width = (data[3] << 8) | data[4];
@@ -164,7 +161,7 @@ struct data* decode_entete(char * path){
                         current_dht->nb_code[i] = nb_code[i];
 
                     }
-                    printf("SYMBOL : %02x\n", total_symbols);
+                    
                     current_dht->huff_values = malloc(total_symbols * sizeof(int16_t));
                     for (int16_t i = 0, offset = 17; i < total_symbols; i++, offset++) {
                         current_dht->huff_values[i] = data[offset];
@@ -204,6 +201,16 @@ struct data* decode_entete(char * path){
                     printf("   other parameters ignored (%d bytes).\n", marker_length - 2 - 1 - nb_composante * 2);
                     printf("   End of Scan Header (SOS)\n\n");
                     stop = 1;
+                    break;
+                }
+                case(0xFE):{
+                    printf("[COM] length %d bytes\n", marker_length);
+                    printf("   ");
+                    for(int i = 0; i < marker_length -2; i ++){
+                        printf("%c",data[i]);
+                    }
+                    printf("\n");
+                    
                     break;
                 }
                 default: {
