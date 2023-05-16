@@ -14,7 +14,7 @@ struct data* init_data() {
     data->find_ff = 0; 
 
     // DQT
-    data->quantization_precision =  malloc(4 * sizeof(int8_t));
+    
     data->quantization_table_read = malloc(4 * sizeof(int16_t*));
     for (int i = 0; i < 4; i++) {
         data->quantization_table_read[i] = malloc(64 * sizeof(int16_t));
@@ -86,7 +86,7 @@ struct data* decode_entete(char * path){
                     printf("   quantization table precision %d bits\n", precision);
                     printf("   quantization table read (64 bytes)\n\n");
 
-                    d->quantization_precision[index] = precision;
+                  
                     for (int i = 0; i < 64; i++) {
                         d->quantization_table_read[index][i] = data[i + 1];
                     }

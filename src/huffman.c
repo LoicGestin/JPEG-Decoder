@@ -76,3 +76,11 @@ void decode_huffman(struct dht_ac_dc *current_dht, int16_t index, int8_t table_t
 
 
 }
+
+void free_huff(struct cellule_huffman *h){
+    if(h != NULL){
+        free_huff(h->left);
+        free_huff(h->right);
+        free(h);
+    }
+}
