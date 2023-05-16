@@ -10,6 +10,11 @@
 
 
 struct data* init_data() {
+    /*structure permettant de récupérer 
+    les informations concernant les tables
+    de quantification, les informations relatives
+    à l'images, les informations sur les tables
+    de huffman et les données brutes encodant l'image*/
     struct data* data = malloc(sizeof(struct data));
     data->find_ff = 0; 
 
@@ -33,28 +38,40 @@ struct data* init_data() {
 }
 
 struct data* decode_entete(char * path){
+    /*structure prenant en entrée un pointeur
+    vers un chemin et permettant de décoder l'en-tête
+    en lisant octet par octet et en détectant la
+    présence des différents marqueurs pour récupérer
+    les informations nécessaires au décodage de l'en -tête*/
     FILE* file = fopen(path, "rb");
 
+    // Si le fichier n'existe pas on affiche un message d'erreur
     if(file == NULL){
         printf("Erreur durant l'ouverture du fichier");
     }
+    // Initialisation de notre structure
     struct data *d = init_data();
     int8_t stop=0;
     BYTE byte;
     int8_t marker_detected = 0;
     int32_t marker_length = 0;
+    // Tant que nous pouvons lire dans le flux
     while (fread(&byte, 1, 1, file)) {
+        // Détection de marqueur avec "ff"
         if (byte == 0xFF) {
             marker_detected = 1;
             continue;
         }
 
+        // Si on lit "ff" dans le flux on lit l'octet suivant pour déterminer le marqueur
         if (marker_detected) {
+            // "d8" = marqueur de début d'image
             if (byte == 0xD8) {
                 printf("[SOI] marker found\n\n");
                 continue;
             }
             if (byte == 0xD9) {
+                // "d9" = marqueur de fin d'image
                 printf("[EOI] marker found\n\n");
                 break;
             }
@@ -71,13 +88,16 @@ struct data* decode_entete(char * path){
             // Pas oublier le -2 car les octets pour donner la taille font partie de la taille
             fread(data, marker_length - 2, 1, file);
 
+            // Détection des autres marqueurs et récupération des informations
             switch (byte) {
+                // image de type JFIF
                 case (0xE0): {
                     printf("[APP0] length %d bytes\n", marker_length);
                     printf("  JFIF application\n");
                     printf("  other parameters ignored (%d bytes).\n", marker_length - 7);
                     break;
                 }
+                // table de quantification
                 case (0xDB): {
                     printf("[DQT] length %d bytes\n", marker_length);
                     BYTE index = data[0] & 0x0F;
@@ -93,11 +113,9 @@ struct data* decode_entete(char * path){
 
                     break;
                 }
+                // informations relatives à l'image
                 case (0xC0): {
-                    printf("[S0FO] length %d bytes\n", marker_length);
-                     for (int8_t i = 0; i < marker_length - 2; i++) {
-                        printf("%02x ", data[i]);
-                     }
+                    printf("[S0FO] length %d bytes\n", marker_length);                   
                     BYTE precision = data[0];
                     int16_t height = (data[1] << 8) | data[2];
                     int16_t width = (data[3] << 8) | data[4];
@@ -110,7 +128,8 @@ struct data* decode_entete(char * path){
                     BYTE nb_components = data[5];
                     d->nb_of_component = nb_components;
                     printf("   nb of component %d\n", nb_components);
-
+                    
+                    // Pour chaque composant (Y,Cb,Cr), on détermine la composante iC, les facteurs d'échantillonnages et l'indice de table de quantification
                     for (int8_t i = 0; i < nb_components; i++) {
                         int32_t offset = 6 + i * 3;
                         BYTE component_id = data[offset];
@@ -127,6 +146,7 @@ struct data* decode_entete(char * path){
                     break;
 
                 }
+                // Table de huffman
                 case (0xC4): {
                     printf("[DHT] length %d bytes\n", marker_length);
                     int8_t type = ((data[0] >> 4) & 0x01) == 0x00;
@@ -134,6 +154,7 @@ struct data* decode_entete(char * path){
                     printf("   Huffman table type: %s\n", type ? "DC" : "AC");
                     printf("   Huffman table index : %d\n", index);
 
+                    // Décompte du nombre de symboles (16 octets donnant le nombre de codes de longueur 1 à 16)
                     int16_t total_symbols = 0;
                     BYTE nb_code[16];
                     for (int8_t i = 0; i < 16; i++) {
@@ -141,6 +162,7 @@ struct data* decode_entete(char * path){
                         total_symbols += data[i + 1];
                     }
 
+                    // On affiche un message d'erreur si le nombre de symboles est supérieur à 256
                     if (total_symbols > 256) {
                         printf("ERREUR NB TOTAL SYMBOLE > 256");
                     }
@@ -148,6 +170,7 @@ struct data* decode_entete(char * path){
                    
                     printf("   total nb of Huffman symbols %d\n", total_symbols);
             
+                    // initialisation de la table de huffman courante
                     struct dht_ac_dc *current_dht = NULL;
                    
                     if (type) {
@@ -164,26 +187,20 @@ struct data* decode_entete(char * path){
                         current_dht->nb_code[i] = nb_code[i];
 
                     }
-                    printf("SYMBOL : %02x\n", total_symbols);
+                    
                     current_dht->huff_values = malloc(total_symbols * sizeof(int16_t));
                     for (int16_t i = 0, offset = 17; i < total_symbols; i++, offset++) {
                         current_dht->huff_values[i] = data[offset];
                     }
                     
-                    decode_huffman(current_dht, index, type);
+                    decode_huffman(current_dht, type);
 
-                    /*
-                    for (int i = 0; i < total_symbols; i++) {
-                        printf("   path: %s symbol: %x\n",
-                               decimal_to_binary(current_dht->huff_code[i], current_dht->huff_length[i]),
-                               current_dht->huff_values[i]);
-                    }
-                     */
                     printf("\n");
 
 
                     break;
                 }
+                // données encodées
                 case (0xDA): {
                     printf("[SOS] length %d bytes\n", marker_length);
                     BYTE nb_composante = data[0];
@@ -204,6 +221,16 @@ struct data* decode_entete(char * path){
                     printf("   other parameters ignored (%d bytes).\n", marker_length - 2 - 1 - nb_composante * 2);
                     printf("   End of Scan Header (SOS)\n\n");
                     stop = 1;
+                    break;
+                }
+                case(0xFE):{
+                    printf("[COM] length %d bytes\n", marker_length);
+                    printf("   ");
+                    for(int i = 0; i < marker_length -2; i ++){
+                        printf("%c",data[i]);
+                    }
+                    printf("\n");
+                    
                     break;
                 }
                 default: {

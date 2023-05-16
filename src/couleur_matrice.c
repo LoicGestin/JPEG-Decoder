@@ -4,15 +4,12 @@
 #include "../include/couleur_matrice.h"
 #include "../include/decode_entete.h"
 
-uint8_t **YCbCr_to_R(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d){
+uint8_t **YCbCr_to_R(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d, uint8_t **R){
 
     struct component *comp = d->list_component;
     int8_t sampling_w = comp->sampling_horizontal;
     int8_t sampling_h = comp->sampling_vertical;
-    uint8_t **R=malloc(8*sampling_h*sizeof(uint8_t *));
-    for(uint8_t i=0; i<8*sampling_h; i++){
-        R[i]=malloc(8*sampling_w*sizeof(uint8_t));
-    }
+    
     for(uint8_t i=0; i<8*sampling_h; i++){
         for(uint8_t j=0; j<8*sampling_w; j++){
             //float r = Y[i][j] - 0.0009267 * (Cb[i][j] - 128) + 1.4016868 * (Cr[i][j] - 128);
@@ -32,15 +29,12 @@ uint8_t **YCbCr_to_R(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d){
     return R;
 }
 
-uint8_t **YCbCr_to_B(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d){
+uint8_t **YCbCr_to_B(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d, uint8_t **B){
 
     struct component *comp = d->list_component;
     int8_t sampling_w = comp->sampling_horizontal;
     int8_t sampling_h = comp->sampling_vertical;
-    uint8_t **B=malloc(8*sampling_h*sizeof(uint8_t *));
-    for(uint8_t i=0; i<8*sampling_h; i++){
-        B[i]=malloc(8*sampling_w*sizeof(uint8_t));
-    }
+    
     for(uint8_t i=0; i<8*sampling_h; i++){
         for(uint8_t j=0; j<8*sampling_w; j++){
             //float b  = Y[i][j] + 1.7721604 * (Cb[i][j] - 128) + 0.0009902 * (Cr[i][j] - 128);
@@ -60,15 +54,12 @@ uint8_t **YCbCr_to_B(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d){
     return B;
 }
 
-uint8_t **YCbCr_to_G(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d){
+uint8_t **YCbCr_to_G(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d,  uint8_t **G){
 
     struct component *comp = d->list_component;
     int8_t sampling_w = comp->sampling_horizontal;
     int8_t sampling_h = comp->sampling_vertical;
-    uint8_t **G=malloc(8*sampling_h*sizeof(uint8_t *));
-    for(uint8_t i=0; i<8*sampling_h; i++){
-        G[i]=malloc(8*sampling_w*sizeof(uint8_t));
-    }
+    
     for(uint8_t i=0; i<8*sampling_h; i++){
         for(uint8_t j=0; j<8*sampling_w; j++){
            //float g = Y[i][j] - 0.3436954 * (Cb[i][j] - 128) - 0.7141690 * (Cr[i][j] - 128);

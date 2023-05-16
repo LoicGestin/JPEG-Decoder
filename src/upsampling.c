@@ -27,6 +27,8 @@ uint8_t ** sur_ech(uint8_t **Cb, struct data *d){
             }  
         }
     }
+
+    free(Cb);
   
     return new_Cb;
 }
