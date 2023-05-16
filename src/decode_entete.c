@@ -122,6 +122,7 @@ struct data* decode_entete(char * path){
                         printf("     quantization table index: %d\n\n", quantization_table_index);
                         d->list_component[i].sampling_horizontal = sampling_factors >> 4;
                         d->list_component[i].sampling_vertical = sampling_factors & 0xF;
+                        d->list_component[i].quantization_table_index = data[offset + 2];
                     }
                     break;
 

@@ -16,16 +16,17 @@
 
 
 int main(int argc, char **argv){
-    struct data *d = decode_entete("../images/zig-zag.jpg");
+    struct data *d = decode_entete("../images/biiiiiig.jpg");
 
   
     int16_t cpt =0;
     int16_t nb_block_ligne = d->image_width / 8 + ((d->image_width % 8 != 0) ? 1 : 0);
     int16_t nb_block_colonne = d->image_height / 8 + ((d->image_height % 8 != 0) ? 1 : 0);
+    
     int16_t precDC = 0;
     int16_t precDC_Cb = 0;
     int16_t precDC_Cr = 0;
-    FILE *test_invaders = fopen("zig-zag.ppm", "wb");
+    FILE *test_invaders = fopen("biiiiiig.ppm", "wb");
     if(d->nb_component_scan == 1){
         uint8_t ***mat=malloc(nb_block_ligne*sizeof(uint8_t **));
         create_pgm_header(test_invaders, d->image_width, d->image_height);
@@ -82,13 +83,19 @@ int main(int argc, char **argv){
         struct component *comp = d->list_component;
         int8_t sampling_w = comp->sampling_horizontal;
         int8_t sampling_h = comp->sampling_vertical;
+
+        nb_block_ligne = d->image_width / (8 * sampling_w) + ((d->image_width % (8 * sampling_w) != 0) ? 1 : 0);
+
+
+       // printf(" ??? %d %d \n",sampling_w,sampling_h);
+       //  printf(" ??? %d %d \n",nb_block_colonne,nb_block_ligne);
         uint8_t ***red=malloc(nb_block_ligne*sampling_w*sizeof(uint8_t **));
         uint8_t ***green=malloc(nb_block_ligne*sampling_w*sizeof(uint8_t **));
         uint8_t ***blue=malloc( nb_block_ligne*sampling_w*sizeof(uint8_t **));
         int16_t **Y = malloc((sampling_h * sampling_w)*sizeof(int16_t *));
         
         for(int16_t k = 0; k < nb_block_colonne/sampling_h; k++){
-            for(int16_t i = 0; i < nb_block_ligne/sampling_w; i++){
+            for(int16_t i = 0; i < nb_block_ligne; i++){
             
                 for(int16_t i = 0; i < sampling_h * sampling_w; i++){
                     Y[i] = malloc(64 * sizeof(int16_t));
@@ -175,6 +182,7 @@ int main(int argc, char **argv){
                     pixel_Y[i] = iDCT(matrice_Y[i]);
                 }
                 
+                
                 uint8_t **pixel_Cb= iDCT(matrice_Cb);
                 /*for(int8_t x = 0; x < 8; x++){
                     for(int8_t j = 0; j < 8; j++){
@@ -196,14 +204,24 @@ int main(int argc, char **argv){
                 for(int8_t i = 0; i < 8 * sampling_h; i++){
                     new_Y[i] = malloc(8 * sampling_w * sizeof(uint8_t));
                 }
-            
+                
                 for(int x= 0 ; x < sampling_h; x++){
-                    for(int i=0; i< 8; i++){
+                    for(int i=0; i< 8 ;i++){
                         for(int j=0; j < 8*sampling_w; j++){
-                            new_Y[i][j] = pixel_Y[(x * sampling_w) + j/8][i][j%8];
+                            //printf("x = %d, i = %d, j = %d\n", x,i,j);
+                            new_Y[(x * 8) + i ][j] = pixel_Y[(x * sampling_w) + j/8][i][j%8];
                         }
                     }
                 }
+                /*
+                for(int8_t x = 0; x < 16; x++){
+                    for(int8_t j = 0; j < 8; j++){
+                        printf("%hx ", new_Y[x][j]);
+                    }
+                    printf("\n");
+                }
+                printf("\n\n");
+                */
                 if( sampling_h != 1 || sampling_w != 1){
                     uint8_t **new_Cb = sur_ech(pixel_Cb, d);
                     uint8_t **new_Cr = sur_ech(pixel_Cr, d);
@@ -235,11 +253,12 @@ int main(int argc, char **argv){
                     printf("\n");
                 }
                 printf("\n\n");*/
-                
-            }    
-
                
+            }    
+            
+           
             create_ppm(test_invaders, red, green , blue, d);
+
         }
 
     } 

@@ -77,8 +77,9 @@ void create_ppm(FILE * file_name,  uint8_t *** R,  uint8_t *** G,  uint8_t *** B
     struct component *comp = d->list_component;
     int8_t sampling_w = comp->sampling_horizontal;
     int8_t sampling_h = comp->sampling_vertical;
-
-    int16_t taille_tab_h = 1;
+    
+    int16_t taille_tab_h = width / (8 * sampling_w) + ((width % (8 * sampling_w) != 0) ? 1 : 0);
+   
     if (width % 8 != 0 ||  height % 8 != 0 ){
         for (int8_t i = 0; i < 8*sampling_h; i++){
             for (int16_t k = 0; k < taille_tab_h; k++){
@@ -121,5 +122,5 @@ void create_ppm(FILE * file_name,  uint8_t *** R,  uint8_t *** G,  uint8_t *** B
         }
     }
 
-    printf("nb pixels : %d\n", nb_pixels);
+    //printf("nb pixels : %d\n", nb_pixels);
 }
