@@ -4,7 +4,7 @@
 #include "../include/couleur_matrice.h"
 #include "../include/decode_entete.h"
 
-uint8_t **YCbCr_to_R(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d, uint8_t **R){
+void YCbCr_to_R(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d, uint8_t **R){
 
     struct component *comp = d->list_component;
     int8_t sampling_w = comp->sampling_horizontal;
@@ -26,10 +26,10 @@ uint8_t **YCbCr_to_R(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d, ui
 
         }
     }
-    return R;
+    
 }
 
-uint8_t **YCbCr_to_B(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d, uint8_t **B){
+void YCbCr_to_B(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d, uint8_t **B){
 
     struct component *comp = d->list_component;
     int8_t sampling_w = comp->sampling_horizontal;
@@ -51,10 +51,10 @@ uint8_t **YCbCr_to_B(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d, ui
             
         }
     }
-    return B;
+    
 }
 
-uint8_t **YCbCr_to_G(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d,  uint8_t **G){
+void YCbCr_to_G(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d, uint8_t **G){
 
     struct component *comp = d->list_component;
     int8_t sampling_w = comp->sampling_horizontal;
@@ -72,9 +72,9 @@ uint8_t **YCbCr_to_G(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d,  u
                 G[i][j] = 255;
             }
             else{
-                G[i][j] = g;
+                G[i][j] = (uint8_t)g;
             }
         }
     }
-    return G;
+   
 }

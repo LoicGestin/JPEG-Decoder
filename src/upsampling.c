@@ -7,16 +7,12 @@
 #include "../include/decode_entete.h"
 
 
-uint8_t ** sur_ech(uint8_t **Cb, struct data *d){
+void sur_ech(uint8_t **Cb, struct data *d, uint8_t **new_Cb){
     // initialisation nouvelle matrice
     struct component *comp = d->list_component;
     int8_t sampling_w = comp->sampling_horizontal;
     int8_t sampling_h = comp->sampling_vertical;
-    uint8_t **new_Cb = malloc(8*sampling_h*sizeof(uint8_t*));
-
-    for(int8_t i = 0; i<8*sampling_h; i++){
-        new_Cb[i] = malloc(8*sampling_w*sizeof(uint8_t));
-    }
+    
 
     for(int16_t i = 0; i<8; i++){
         for(int x = 0; x < sampling_h; x ++ ){
@@ -27,9 +23,5 @@ uint8_t ** sur_ech(uint8_t **Cb, struct data *d){
             }  
         }
     }
-
-    free(Cb);
-  
-    return new_Cb;
 }
 

@@ -10,8 +10,6 @@ struct data{
     int8_t num_bit;
     int8_t find_ff;
     // DQT
-   
-    int8_t * quantization_index;
     int16_t ** quantization_table_read;
     // SOF0
     int16_t sample_precision;
@@ -25,8 +23,6 @@ struct data{
     // SOS
     int16_t nb_component_scan;
     struct scan_component* list_scan_components;
-    int16_t **decoded_blocks;
-
 };
 
 struct dht_ac_dc{

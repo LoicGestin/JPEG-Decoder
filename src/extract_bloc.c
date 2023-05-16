@@ -94,14 +94,15 @@ int16_t * decode_ac_dc(struct data *d, int16_t index, int8_t table_type,FILE* fi
             if ((value & (1 << (magnitude - 1))) == 0) {
                 value +=(-(1 << magnitude) + 1);
             }
-
+            
             block[cpt] = value;
             cpt ++;
         }
         else{
-
+            if(cpt < 64){
             block[cpt] =0;
             cpt ++;
+            }
         }
         
         //printf("%x(%x) ",symbol,d->byte);

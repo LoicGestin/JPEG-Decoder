@@ -3,14 +3,11 @@
 
 #include "../include/zig_zag.h"
 
-int16_t ** zig_zag(const int16_t *tab){
+void zig_zag(const int16_t *tab, int16_t **matrice){
 /*Fonction prenant en entrée un pointeur vers un tableau de 64 valeurs et faisant
 l'opération de zig zag inverse pour retourner une matrice 8x8*/
 
-    int16_t **matrice = malloc(8*sizeof(int16_t*));
-    for(int8_t i=0; i<8; i++){
-        matrice[i]=malloc(8*sizeof(int16_t));
-    }
+    
     int8_t i =0;
     int8_t j=0;
     int8_t k=0;
@@ -77,5 +74,4 @@ l'opération de zig zag inverse pour retourner une matrice 8x8*/
     }
 
 
-    return matrice;
 }

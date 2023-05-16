@@ -3,6 +3,6 @@
 
 #include "decode_entete.h"
 
-uint8_t ** sur_ech(uint8_t **Cb, struct data *d);
+void sur_ech(uint8_t **Cb, struct data *d, uint8_t **new_Cb);
 
 #endif /*_UPSAMPLING_H_*/

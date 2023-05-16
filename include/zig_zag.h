@@ -1,6 +1,6 @@
 #ifndef _ZIG_ZAG_H_
 #define _ZIG_ZAG_H_
 
-int16_t ** zig_zag(const int16_t *tab);
+void zig_zag(const int16_t *tab, int16_t **matrice);
 
 #endif /* _ZIG_ZAG_H_ */

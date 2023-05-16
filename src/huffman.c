@@ -6,8 +6,6 @@
 #include "../include/decode_entete.h"
 
 void insert_code_huffman(struct cellule_huffman **c,int16_t value, int16_t length, int16_t symbol){
-    /*Fonction prenant en entrée un double pointeur vers une cellule de huffman, une valeur, une longueur
-    et un symbole et permettant d'insérer un code huffman dans l'arbre*/
     if (*c == NULL) {
         *c = malloc(sizeof(struct cellule_huffman));
         (*c)->symbol = -1;
@@ -27,8 +25,6 @@ void insert_code_huffman(struct cellule_huffman **c,int16_t value, int16_t lengt
     }
 }
 void display_huffman_tree(struct cellule_huffman* c, char* path) {
-    /*Fonction prenant en entrée un pointeur vers une cellule de huffman et
-    un autre pointeur vers un chemin pour afficher un arbre de huffman*/
     if (c == NULL) {
         return;
     }
@@ -53,8 +49,6 @@ void display_huffman_tree(struct cellule_huffman* c, char* path) {
 }
 
 void decode_huffman(struct dht_ac_dc *current_dht, int8_t table_type){
-    /*Fonction prenant en entrée un pointeur vers une table de huffman, et un type de table
-    permettant de décoder la table*/
 
     //struct dht_ac_dc *current_dht = table_type ? &d->list_dc[index] :  &d->list_ac[index];
     //current_dht->huff_code = malloc(current_dht->nb_symbols * sizeof(int));

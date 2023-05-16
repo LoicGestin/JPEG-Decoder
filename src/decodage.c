@@ -34,6 +34,17 @@ int main(int argc, char **argv){
 
         int16_t *block = malloc(sizeof (int16_t) * 64);
 
+        uint8_t **S=malloc(8*sizeof(uint8_t*));
+        for(int8_t x=0; x<8; x++){
+            S[x]=malloc(8*sizeof(uint8_t));
+        }
+
+        int16_t **matrice = malloc(8*sizeof(int16_t*));
+        for(int8_t i=0; i<8; i++){
+            matrice[i]=malloc(8*sizeof(int16_t));
+        }
+
+
         for(int16_t k = 0; k < nb_block_colonne; k++){
 
             for (int16_t i = 0; i < nb_block_ligne; i++){
@@ -43,13 +54,13 @@ int main(int argc, char **argv){
                 block[0] = block[0] + precDC;
                 precDC = block[0];
 
-                int16_t * data = quantification_inverse(d,0,block);
+                quantification_inverse(d,0,block);
 
-                int16_t ** matrice = zig_zag(data);
+                zig_zag(block, matrice);
                 
-                uint8_t **pixel= iDCT(matrice);
+                iDCT(matrice, S);
                 
-                mat[i]=pixel;
+                mat[i]=S;
 
             }
             create_pgm(test_invaders ,mat, d->image_width, d->image_height);
@@ -57,6 +68,14 @@ int main(int argc, char **argv){
         fclose(test_invaders);
         free(mat);
         free(block);
+        for(int i = 0; i < 8 ; i ++){
+            free(S[i]);
+            free(matrice[i]);
+        }
+        free(S);
+        free(matrice);
+
+
 }
     else{
         
@@ -68,9 +87,30 @@ int main(int argc, char **argv){
         nb_block_ligne = d->image_width / (8 * sampling_w) + ((d->image_width % (8 * sampling_w) != 0) ? 1 : 0);
 
         uint8_t ***red=malloc(nb_block_ligne*sampling_w*sizeof(uint8_t **));
+        for(int16_t i = 0; i < nb_block_ligne*sampling_w; i++){
+            red[i] = malloc(8*sampling_h*sizeof(uint8_t *));
+            for(int16_t j = 0; j < 8*sampling_h; j++){
+                red[i][j] = malloc(8*sampling_w*sizeof(uint8_t));
+            }
+        }
         uint8_t ***green=malloc(nb_block_ligne*sampling_w*sizeof(uint8_t **));
+        for(int16_t i = 0; i < nb_block_ligne*sampling_w; i++){
+            green[i] = malloc(8*sampling_h*sizeof(uint8_t *));
+            for(int16_t j = 0; j < 8*sampling_h; j++){
+                green[i][j] = malloc(8*sampling_w*sizeof(uint8_t));
+            }
+        }
         uint8_t ***blue=malloc( nb_block_ligne*sampling_w*sizeof(uint8_t **));
+        for(int16_t i = 0; i < nb_block_ligne*sampling_w; i++){
+            blue[i] = malloc(8*sampling_h*sizeof(uint8_t *));
+            for(int16_t j = 0; j < 8*sampling_h; j++){
+                blue[i][j] = malloc(8*sampling_w*sizeof(uint8_t));
+            }
+        }
         int16_t **Y = malloc((sampling_h * sampling_w)*sizeof(int16_t *));
+        for(int16_t i = 0; i < sampling_h * sampling_w; i++){
+            Y[i] = malloc(64 * sizeof(int16_t));
+        }
         int16_t *block_Cb = malloc(sizeof (int16_t) * 64);
         int16_t *block_Cr = malloc(sizeof (int16_t) * 64);
 
@@ -80,28 +120,57 @@ int main(int argc, char **argv){
         }
 
         int16_t ***matrice_Y = malloc((sampling_h * sampling_w)*sizeof(int16_t **));
+        for (int16_t i = 0; i < sampling_h * sampling_w; i++){
+            matrice_Y[i] = malloc(8*sizeof(int16_t*));
+            for(int8_t j=0; j<8; j++){
+                matrice_Y[i][j]=malloc(8*sizeof(int16_t));
+            }
+        }
         uint8_t ***pixel_Y = malloc((sampling_h * sampling_w)*sizeof(uint8_t **));
-
-        uint8_t **R=malloc(8*sampling_h*sizeof(uint8_t *));
-        for(uint8_t i=0; i<8*sampling_h; i++){
-            R[i]=malloc(8*sampling_w*sizeof(uint8_t));
-        }
-        uint8_t **B=malloc(8*sampling_h*sizeof(uint8_t *));
-        for(uint8_t i=0; i<8*sampling_h; i++){
-            B[i]=malloc(8*sampling_w*sizeof(uint8_t));
-        }
-        uint8_t **G=malloc(8*sampling_h*sizeof(uint8_t *));
-        for(uint8_t i=0; i<8*sampling_h; i++){
-            G[i]=malloc(8*sampling_w*sizeof(uint8_t));
+        
+        for(int8_t i = 0; i<sampling_w*sampling_h; i++){
+            pixel_Y[i] = malloc(8*sizeof(uint8_t *));
+            for(uint8_t j=0; j<8; j++){
+                pixel_Y[i][j]= malloc(8*sizeof(uint8_t));
+            }
         }
 
+        uint8_t **pixel_Cb=malloc(8*sizeof(uint8_t*));
+        for(int8_t x=0; x<8; x++){
+            pixel_Cb[x]=malloc(8*sizeof(uint8_t));
+        }
+
+        uint8_t **pixel_Cr=malloc(8*sizeof(uint8_t*));
+        for(int8_t x=0; x<8; x++){
+            pixel_Cr[x]=malloc(8*sizeof(uint8_t));
+        }
+
+        uint8_t **new_Cb = malloc(8*sampling_h*sizeof(uint8_t*));
+        for(int8_t i = 0; i<8*sampling_h; i++){
+            new_Cb[i] = malloc(8*sampling_w*sizeof(uint8_t));
+        }
+
+        uint8_t **new_Cr = malloc(8*sampling_h*sizeof(uint8_t*));
+        for(int8_t i = 0; i<8*sampling_h; i++){
+            new_Cr[i] = malloc(8*sampling_w*sizeof(uint8_t));
+        }
+
+        int16_t **matrice_Cb = malloc(8*sizeof(int16_t*));
+        for(int8_t i=0; i<8; i++){
+            matrice_Cb[i]=malloc(8*sizeof(int16_t));
+        }
+
+        int16_t **matrice_Cr = malloc(8*sizeof(int16_t*));
+        for(int8_t i=0; i<8; i++){
+            matrice_Cr[i]=malloc(8*sizeof(int16_t));
+        }
+
+       
+      
         for(int16_t k = 0; k < nb_block_colonne/sampling_h; k++){
-            for(int16_t i = 0; i < nb_block_ligne; i++){
             
-                for(int16_t i = 0; i < sampling_h * sampling_w; i++){
-                    Y[i] = malloc(64 * sizeof(int16_t));
-                }
-
+            for(int16_t i = 0; i < nb_block_ligne; i++){
+                   
                 for(int16_t i = 0; i < sampling_h * sampling_w; i++){
                     decode_ac_dc(d,d->list_scan_components[0].associated_dc_huffman_table_index,1,d->file,Y[i]);
                     decode_ac_dc(d,d->list_scan_components[0].associated_ac_huffman_table_index,0,d->file,Y[i]);
@@ -115,7 +184,7 @@ int main(int argc, char **argv){
                 decode_ac_dc(d,d->list_scan_components[1].associated_ac_huffman_table_index,0,d->file,block_Cb);
                 block_Cb[0] = block_Cb[0] + precDC_Cb;
                 precDC_Cb = block_Cb[0];
-                  
+                
                 decode_ac_dc(d,d->list_scan_components[2].associated_dc_huffman_table_index,1,d->file,block_Cr);
                 decode_ac_dc(d,d->list_scan_components[2].associated_ac_huffman_table_index,0,d->file,block_Cr);
                 block_Cr[0] = block_Cr[0] + precDC_Cr;
@@ -123,29 +192,34 @@ int main(int argc, char **argv){
 
 
                 for(int16_t i = 0; i < sampling_h * sampling_w; i++){
-                    Y[i] = quantification_inverse(d,d->list_component[0].quantization_table_index,Y[i]);
+                    quantification_inverse(d,d->list_component[0].quantization_table_index,Y[i]);
                 }
                
                 
-                int16_t * data_Cb = quantification_inverse(d,d->list_component[1].quantization_table_index,block_Cb);
+                quantification_inverse(d,d->list_component[1].quantization_table_index,block_Cb);
                 
-                int16_t * data_Cr = quantification_inverse(d,d->list_component[2].quantization_table_index,block_Cr);
+                quantification_inverse(d,d->list_component[2].quantization_table_index,block_Cr);
 
                 for(int16_t i = 0; i < sampling_h*sampling_w; i++){
-                    matrice_Y[i] = zig_zag(Y[i]);
+                    zig_zag(Y[i], matrice_Y[i]);
                 }
-                
-                int16_t ** matrice_Cb = zig_zag(data_Cb);
-                
-                int16_t ** matrice_Cr = zig_zag(data_Cr);
+               
+                zig_zag(block_Cb, matrice_Cb);
+              
+                 
+                zig_zag(block_Cr, matrice_Cr);
 
+                 
                 for(int16_t i = 0; i < sampling_h*sampling_w; i++){
-                    pixel_Y[i] = iDCT(matrice_Y[i]);
+                    iDCT(matrice_Y[i], pixel_Y[i]);
                 }
-                uint8_t **pixel_Cb= iDCT(matrice_Cb);
-                uint8_t **pixel_Cr= iDCT(matrice_Cr);
-                
-                
+               
+
+                iDCT(matrice_Cb, pixel_Cb);
+              
+                iDCT(matrice_Cr, pixel_Cr);
+
+                 
                 for(int x= 0 ; x < sampling_h; x++){
                     for(int i=0; i< 8 ;i++){
                         for(int j=0; j < 8*sampling_w; j++){
@@ -153,24 +227,32 @@ int main(int argc, char **argv){
                         }
                     }
                 }
-                
+                       
+
                 if( sampling_h != 1 || sampling_w != 1){
-                    uint8_t **new_Cb = sur_ech(pixel_Cb, d);
-                    uint8_t **new_Cr = sur_ech(pixel_Cr, d);
-                    red[i] = YCbCr_to_R(new_Y, new_Cb, new_Cr, d, R);
-                    green[i] = YCbCr_to_G(new_Y, new_Cb, new_Cr, d, G);
-                    blue[i] = YCbCr_to_B(new_Y, new_Cb, new_Cr, d, B);
+                    sur_ech(pixel_Cb, d, new_Cb);
+                    sur_ech(pixel_Cr, d, new_Cr);
+                  
+                    YCbCr_to_R(new_Y, new_Cb, new_Cr, d, red[i]);
+                    YCbCr_to_G(new_Y, new_Cb, new_Cr, d, green[i]);
+                    YCbCr_to_B(new_Y, new_Cb, new_Cr, d, blue[i]);
                 }
                 else{
-                    red[i] = YCbCr_to_R(new_Y, pixel_Cb, pixel_Cr, d, R);
-                    green[i] = YCbCr_to_G(new_Y, pixel_Cb, pixel_Cr, d, G);
-                    blue[i] = YCbCr_to_B(new_Y, pixel_Cb, pixel_Cr, d, B);
+                    
+                    YCbCr_to_R(new_Y, pixel_Cb, pixel_Cr, d, red[i]);
+                    YCbCr_to_G(new_Y, pixel_Cb, pixel_Cr, d, green[i]);
+                    YCbCr_to_B(new_Y, pixel_Cb, pixel_Cr, d, blue[i]);
+
+            
                 }
+           
+              
                
             }    
-            
+        
             create_ppm(test_invaders, red, green , blue, d);
         }
+        
         fclose(test_invaders); 
 
         for(int i = 0; i < nb_block_ligne*sampling_w ; i ++){
@@ -186,62 +268,81 @@ int main(int argc, char **argv){
         free(red);
         free(green);
         free(blue);
+        for(int16_t i = 0; i < sampling_h * sampling_w; i++){
+            free(Y[i]);
+        }
         free(Y);
-       
+            
         free(block_Cb);
         free(block_Cr);
         for(int i = 0; i < 8*sampling_h ; i ++){
             free(new_Y[i]);
+            free(new_Cb[i]);
+            free(new_Cr[i]);
         }
         free(new_Y);
-        for(int i = 0; i < 8*sampling_h ; i ++){
-            free(new_Y[i]);
+        free(new_Cb);
+        free(new_Cr);
+         
+        for (int16_t i = 0; i < sampling_h * sampling_w; i++){
+            for(int8_t j=0; j<8; j++){
+                free(matrice_Y[i][j]);
+                free(pixel_Y[i][j]);
+            }
+            free(matrice_Y[i]);
+            free(pixel_Y[i]);
         }
         free(matrice_Y);
         free(pixel_Y);
-        free(d->quantization_index);
+       
+        for(int8_t i=0; i<8; i++){
+            free(pixel_Cb[i]);
+            free(pixel_Cr[i]);
+            free(matrice_Cb[i]);
+            free(matrice_Cr[i]);
+
+        }
+        free(pixel_Cb);
+        free(pixel_Cr);
+        free(matrice_Cb);
+        free(matrice_Cr);
+
+       
+        
         for (int i = 0; i < 4; i++) {
-            free(d->quantization_table_read[i]);
+            if(d->quantization_table_read[i] != NULL){
+                free(d->quantization_table_read[i]);
+            }
         }
+        
         free(d->quantization_table_read);
-        for(int8_t i = 0; i < d->nb_of_component; i++){
-            free(&d->list_component[i]);
-        }
+          
         free(d->list_component);
-        /*
-        for(int8_t i = 0; i < 4; i++ ){
-            free(d->list_dc[i].huff_values);
-            free_huff(d->list_dc[i].racine_huffman);
-            free(&d->list_dc[i]);
+        free(d->list_scan_components);
+       
+        for(int8_t i = 0; i < 2; i++ ){
+            if(d->list_dc[i].huff_values != NULL){
+                free(d->list_dc[i].huff_values);
+                free_huff(d->list_dc[i].racine_huffman);
+                
+            }
         }
         free(d->list_dc);
+        
 
-
-        for(int8_t i = 0; i < 4; i++ ){
-            if(d->list_dc[i].huff_values != NULL){
+        for(int8_t i = 0; i < 2; i++ ){
+            if(d->list_ac[i].huff_values != NULL){
                 free(d->list_ac[i].huff_values);
                 free_huff(d->list_ac[i].racine_huffman);
-                free(&d->list_ac[i]);
             }
         }
         free(d->list_ac);
-        */
+        
 
 
     
         free(d);
-        for(int i = 0; i < 8*sampling_h ; i ++){
-            free(R[i]);
-        }
-        free(R);
-        for(int i = 0; i < 8*sampling_h ; i ++){
-            free(G[i]);
-        }
-        free(G);
-        for(int i = 0; i < 8*sampling_h ; i ++){
-            free(B[i]);
-        }
-        free(B);
+      
 
     } 
 

@@ -7,10 +7,9 @@
 
 #define pi 3.14159265359
 
-uint8_t **iDCT(int16_t **phi){
-    uint8_t **S=malloc(8*sizeof(uint8_t*));
+void iDCT(int16_t **phi, uint8_t **S){
     for(int8_t x=0; x<8; x++){
-        S[x]=malloc(8*sizeof(uint8_t));
+
         for(int8_t y=0; y<8; y++){
             float dep = (1 / sqrt(16));
             
@@ -40,5 +39,4 @@ uint8_t **iDCT(int16_t **phi){
            
         }
     }
-    return S;
 }

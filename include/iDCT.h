@@ -2,6 +2,6 @@
 #define _IDCT_H_
 #include <stdint.h>
 
-uint8_t ** iDCT(int16_t **phi);
+void iDCT(int16_t **phi, uint8_t **S);
 
 #endif /*_IDCT_H_*/

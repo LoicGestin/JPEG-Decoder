@@ -4,6 +4,6 @@
 
 #include "decode_entete.h"
 
-int16_t * quantification_inverse(struct data *d, int8_t index,  const int16_t *frequentiel);
+void quantification_inverse(struct data *d, int8_t index,  int16_t *frequentiel);
 
 #endif /* _QUANTIFICATION_INVERSE_H_ */
