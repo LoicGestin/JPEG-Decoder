@@ -13,13 +13,13 @@ struct data* init_data() {
     /*structure permettant de récupérer 
     les informations concernant les tables
     de quantification, les informations relatives
-    à l'images, les informations sur les tables
+    à l'image, les informations sur les tables
     de huffman et les données brutes encodant l'image*/
+
     struct data* data = malloc(sizeof(struct data));
     data->find_ff = 0; 
 
     // DQT
-    
     data->quantization_table_read = malloc(4 * sizeof(int16_t*));
     for (int i = 0; i < 4; i++) {
         data->quantization_table_read[i] = malloc(64 * sizeof(int16_t));
@@ -43,6 +43,7 @@ struct data* decode_entete(char * path){
     en lisant octet par octet et en détectant la
     présence des différents marqueurs pour récupérer
     les informations nécessaires au décodage de l'en -tête*/
+
     FILE* file = fopen(path, "rb");
 
     // Si le fichier n'existe pas on affiche un message d'erreur
@@ -70,8 +71,8 @@ struct data* decode_entete(char * path){
                 printf("[SOI] marker found\n\n");
                 continue;
             }
+            // "d9" = marqueur de fin d'image
             if (byte == 0xD9) {
-                // "d9" = marqueur de fin d'image
                 printf("[EOI] marker found\n\n");
                 break;
             }
@@ -170,7 +171,7 @@ struct data* decode_entete(char * path){
                    
                     printf("   total nb of Huffman symbols %d\n", total_symbols);
             
-                    // initialisation de la table de huffman courante
+                    // Initialisation de la table de huffman courante
                     struct dht_ac_dc *current_dht = NULL;
                    
                     if (type) {
@@ -200,13 +201,14 @@ struct data* decode_entete(char * path){
 
                     break;
                 }
-                // données encodées
+                // Données encodées
                 case (0xDA): {
                     printf("[SOS] length %d bytes\n", marker_length);
                     BYTE nb_composante = data[0];
                     d->nb_component_scan = nb_composante;
                     printf("   nb of components in scan %d\n", nb_composante);
                     d->list_scan_components = malloc(nb_composante * sizeof(struct scan_component));
+                    // Pour chaque composante, on associe un identifiant, une table de huffman AC et DC
                     for (int16_t i = 0; i < nb_composante; i++) {
                         printf("   scan component index %d\n", i);
                         BYTE ic_composante = data[1 + (2 * i)];
@@ -223,6 +225,7 @@ struct data* decode_entete(char * path){
                     stop = 1;
                     break;
                 }
+                // Commentaires
                 case(0xFE):{
                     printf("[COM] length %d bytes\n", marker_length);
                     printf("   ");
@@ -233,6 +236,7 @@ struct data* decode_entete(char * path){
                     
                     break;
                 }
+                // Si on détecte un autre marqueur, il faudra l'implémenter
                 default: {
                     printf("[%x] Marker a implementer \n", byte);
                     break;
