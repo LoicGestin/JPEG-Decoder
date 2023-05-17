@@ -19,6 +19,15 @@
 
 
 int main(int argc, char **argv){
+
+    if (argc != 2) {
+        /*
+          #  Si y'a pas au moins un argument en ligne de commandes, on
+          #  boude.
+        */
+        fprintf(stderr, "Usage: %s fichier.jpeg\n", argv[0]);
+        return EXIT_FAILURE;
+    }
     struct data *d = decode_entete("../images/biiiiiig.jpg");
   
     float cos_tab[8][8]; 
@@ -239,15 +248,15 @@ int main(int argc, char **argv){
                     sur_ech(pixel_Cb, d, new_Cb);
                     sur_ech(pixel_Cr, d, new_Cr);
                   
-                    YCbCr_to_R(new_Y, new_Cb, new_Cr, d, red[i]);
+                    YCbCr_to_R(new_Y, new_Cr, d, red[i]);
                     YCbCr_to_G(new_Y, new_Cb, new_Cr, d, green[i]);
-                    YCbCr_to_B(new_Y, new_Cb, new_Cr, d, blue[i]);
+                    YCbCr_to_B(new_Y, new_Cb, d, blue[i]);
                 }
                 else{
                     
-                    YCbCr_to_R(new_Y, pixel_Cb, pixel_Cr, d, red[i]);
+                    YCbCr_to_R(new_Y, pixel_Cr, d, red[i]);
                     YCbCr_to_G(new_Y, pixel_Cb, pixel_Cr, d, green[i]);
-                    YCbCr_to_B(new_Y, pixel_Cb, pixel_Cr, d, blue[i]);
+                    YCbCr_to_B(new_Y, pixel_Cb, d, blue[i]);
 
             
                 }
