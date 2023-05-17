@@ -5,12 +5,18 @@
 
 
 int8_t read_bit(BYTE byte, int8_t num_bit){
-    //printf("byte %x  : numéro %d = %d\n", byte,num_bit,(byte >> (num_bit )) & 1);
+    /*Fonction prenant en entrée un octet et un numéro de bit et renvoyant
+    la valeur correspondante au numéro de bitssssssssssssssssssssssssssssssssssssssssssss*/
     return (byte >> ( 7 - num_bit )) & 1 ;
 }
 int16_t * decode_ac_dc(struct data *d, int16_t index, int8_t table_type,FILE* file,  int16_t * block){
+    /*Fonction prenant en entrée un pointeur vers notre structure data, un index, un type de table
+    un pointeur vers un fichier et un pointeur vers un bloc et permettant de décoder les coefficients AC et DC*/
+
+    // Déterminer la table de huffman (1 pour DC et 0 pour AC)
     struct dht_ac_dc *current_dht = table_type ?&d->list_dc[index] : &d->list_ac[index];
-   
+    
+    // Lecture d'un nouvel octet si d->num_bit vaut 1
     if(d->num_bit == -1) {
         fread(&d->byte, 1, 1, file);
         d->num_bit = 0;
@@ -25,12 +31,14 @@ int16_t * decode_ac_dc(struct data *d, int16_t index, int8_t table_type,FILE* fi
     int8_t cpt =table_type ? 0 : 1;
     int8_t val = table_type ? 1 : 64;
 
+    // Parcours de tous les coefficients
     while(cpt < val){
-        // JE SUIS REST2 BLOQU2 2 PUTAIN DHEURE CAR J4AVAIS MIS UN && !!!!!!!!!!!!!!!!!!!!!!!!
+        // Parcours de l'arbre
         while(current_cel->right != NULL || current_cel->left != NULL){
             bit = read_bit(d->byte,d->num_bit);
             //printf("Byte = %x  : %d %d %d %d %d %d %d %d\n",d->byte,read_bit(d->byte,0),read_bit(d->byte,1),read_bit(d->byte,2),read_bit(d->byte,3),read_bit(d->byte,4),read_bit(d->byte,5),read_bit(d->byte,6),read_bit(d->byte,7));
             current_cel = bit ? current_cel->right : current_cel->left;
+            // Lecture d'un nouvel octet si d->num_bit arrive à 7
             if(d->num_bit == 7){
                 fread(&d->byte, 1, 1, file);
                 if(d->find_ff){
