@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "../include/huffman.h"
 #include "../include/decode_entete.h"
@@ -60,13 +61,9 @@ void display_huffman_tree(struct cellule_huffman* c, char* path) {
     }
 }
 
-void decode_huffman(struct dht_ac_dc *current_dht, int8_t table_type){
-/*Fonction prenant en entrée une table de huffman et son type et
+void decode_huffman(struct dht_ac_dc *current_dht){
+/*Fonction prenant en entrée une table de huffman et
 permettant de décoder cette table*/
-
-    //struct dht_ac_dc *current_dht = table_type ? &d->list_dc[index] :  &d->list_ac[index];
-    //current_dht->huff_code = malloc(current_dht->nb_symbols * sizeof(int));
-    //current_dht->huff_length = malloc(current_dht->nb_symbols * sizeof(int));
 
     // Allocation de mémoire pour la racine et initialisation des attributs
     current_dht->racine_huffman = malloc(sizeof(struct cellule_huffman));
@@ -82,8 +79,6 @@ permettant de décoder cette table*/
     for(int8_t i=0; i<16; i ++){
         // Pour chaque codes associées à cette longueur
         for(int16_t j=0; j < current_dht->nb_code[i]; j++){
-            //current_dht->huff_code[ind] = value;
-            //current_dht->huff_length[ind] = length;
             // Insertion du code de huffman dans l'arbre
             insert_code_huffman(&current_dht->racine_huffman,value,length+1,current_dht->huff_values[ind]);
             value ++;
