@@ -4,7 +4,7 @@
 #include "../include/couleur_matrice.h"
 #include "../include/decode_entete.h"
 
-void YCbCr_to_R(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d, uint8_t **R){
+void YCbCr_to_R(uint8_t **Y, uint8_t **Cr, struct data *d, uint8_t **R){
 
     struct component *comp = d->list_component;
     int8_t sampling_w = comp->sampling_horizontal;
@@ -29,7 +29,7 @@ void YCbCr_to_R(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d, uint8_t
     
 }
 
-void YCbCr_to_B(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d, uint8_t **B){
+void YCbCr_to_B(uint8_t **Y, uint8_t **Cb, struct data *d, uint8_t **B){
 
     struct component *comp = d->list_component;
     int8_t sampling_w = comp->sampling_horizontal;
