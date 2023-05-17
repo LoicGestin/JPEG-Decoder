@@ -11,9 +11,12 @@ l'opération de zig zag inverse pour retourner une matrice 8x8*/
     int8_t i =0;
     int8_t j=0;
     int8_t k=0;
+
+    // Iniatialisation du premier élément de la matrice 
     matrice[i][j]=tab[k];
     j++;
     k++;
+    
     while (k<64){
         if (k<35){
             if(j%2 && i==0){

@@ -15,10 +15,8 @@ struct data* init_data() {
     de quantification, les informations relatives
     à l'image, les informations sur les tables
     de huffman et les données brutes encodant l'image*/
-
     struct data* data = malloc(sizeof(struct data));
     data->find_ff = 0; 
-
     // DQT
     data->quantization_table_read = malloc(4 * sizeof(int16_t*));
     for (int i = 0; i < 4; i++) {
@@ -33,7 +31,6 @@ struct data* init_data() {
     data->list_ac =  malloc(4 * sizeof(struct dht_ac_dc ));
     // SOS
     data->list_scan_components =  NULL;
-
     return data;
 }
 
@@ -81,10 +78,7 @@ struct data* decode_entete(char * path){
 
             fread(&msb, 1, 1, file);
             fread(&lsb, 1, 1, file);
-            
-
             marker_length = (msb << 8) | lsb;
-
             BYTE *data = malloc(sizeof(BYTE *) * marker_length - 2);
             // Pas oublier le -2 car les octets pour donner la taille font partie de la taille
             fread(data, marker_length - 2, 1, file);
@@ -106,12 +100,9 @@ struct data* decode_entete(char * path){
                     printf("   quantization table index %d\n", index);
                     printf("   quantization table precision %d bits\n", precision);
                     printf("   quantization table read (64 bytes)\n\n");
-
-                  
                     for (int i = 0; i < 64; i++) {
                         d->quantization_table_read[index][i] = data[i + 1];
                     }
-
                     break;
                 }
                 // informations relatives à l'image
@@ -129,7 +120,6 @@ struct data* decode_entete(char * path){
                     BYTE nb_components = data[5];
                     d->nb_of_component = nb_components;
                     printf("   nb of component %d\n", nb_components);
-                    
                     // Pour chaque composant (Y,Cb,Cr), on détermine la composante iC, les facteurs d'échantillonnages et l'indice de table de quantification
                     for (int8_t i = 0; i < nb_components; i++) {
                         int32_t offset = 6 + i * 3;
@@ -145,7 +135,6 @@ struct data* decode_entete(char * path){
                         d->list_component[i].quantization_table_index = data[offset + 2];
                     }
                     break;
-
                 }
                 // Table de huffman
                 case (0xC4): {
@@ -154,7 +143,6 @@ struct data* decode_entete(char * path){
                     int16_t index = data[0] & 0x0F;
                     printf("   Huffman table type: %s\n", type ? "DC" : "AC");
                     printf("   Huffman table index : %d\n", index);
-
                     // Décompte du nombre de symboles (16 octets donnant le nombre de codes de longueur 1 à 16)
                     int16_t total_symbols = 0;
                     BYTE nb_code[16];
@@ -162,43 +150,29 @@ struct data* decode_entete(char * path){
                         nb_code[i] = data[i + 1];
                         total_symbols += data[i + 1];
                     }
-
                     // On affiche un message d'erreur si le nombre de symboles est supérieur à 256
                     if (total_symbols > 256) {
                         printf("ERREUR NB TOTAL SYMBOLE > 256");
                     }
-
-                   
                     printf("   total nb of Huffman symbols %d\n", total_symbols);
-            
                     // Initialisation de la table de huffman courante
                     struct dht_ac_dc *current_dht = NULL;
-                   
                     if (type) {
                         current_dht = &d->list_dc[index];
                     } else {
                         current_dht = &d->list_ac[index];
                     }
                     current_dht->table_type = type;
-
-
-                    
                     current_dht->nb_symbols = total_symbols;
                     for (int8_t i = 0; i < 16; i++) {
                         current_dht->nb_code[i] = nb_code[i];
-
                     }
-                    
                     current_dht->huff_values = malloc(total_symbols * sizeof(int16_t));
                     for (int16_t i = 0, offset = 17; i < total_symbols; i++, offset++) {
                         current_dht->huff_values[i] = data[offset];
                     }
-                    
                     decode_huffman(current_dht, type);
-
                     printf("\n");
-
-
                     break;
                 }
                 // Données encodées
@@ -233,7 +207,6 @@ struct data* decode_entete(char * path){
                         printf("%c",data[i]);
                     }
                     printf("\n");
-                    
                     break;
                 }
                 // Si on détecte un autre marqueur, il faudra l'implémenter
@@ -242,16 +215,13 @@ struct data* decode_entete(char * path){
                     break;
                 }
             }
-
             free(data);
             marker_detected = 0;
         }
         if(stop){
             break;
         }
-
     }
-
 
     d->file = file;
     d->byte = byte;

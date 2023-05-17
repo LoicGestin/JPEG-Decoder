@@ -15,10 +15,19 @@
 #include "../include/zig_zag.h"
 
 
-int main(int argc, char **argv){
-    struct data *d = decode_entete("../images/zig-zag.jpg");
+#define pi 3.14159265359
 
+
+int main(int argc, char **argv){
+    struct data *d = decode_entete("../images/biiiiiig.jpg");
   
+    float cos_tab[8][8]; 
+    for(int8_t i = 0; i < 8; i++){
+        for(int8_t j = 0; j < 8; j++){
+            cos_tab[i][j] = cosf(((2*j+1)*i*pi)/(16));
+        }
+    }
+
     int16_t nb_block_ligne = d->image_width / 8 + ((d->image_width % 8 != 0) ? 1 : 0);
     int16_t nb_block_colonne = d->image_height / 8 + ((d->image_height % 8 != 0) ? 1 : 0);
     
@@ -26,7 +35,7 @@ int main(int argc, char **argv){
     int16_t precDC_Cb = 0;
     int16_t precDC_Cr = 0;
 
-    FILE *test_invaders = fopen("zig-zag.ppm", "wb");
+    FILE *test_invaders = fopen("biiiiiig.ppm", "wb");
 
     if(d->nb_component_scan == 1){
         uint8_t ***mat=malloc(nb_block_ligne*sizeof(uint8_t **));
@@ -58,7 +67,7 @@ int main(int argc, char **argv){
 
                 zig_zag(block, matrice);
                 
-                iDCT(matrice, S);
+                iDCT(matrice, S,cos_tab);
                 
                 mat[i]=S;
 
@@ -164,17 +173,14 @@ int main(int argc, char **argv){
         for(int8_t i=0; i<8; i++){
             matrice_Cr[i]=malloc(8*sizeof(int16_t));
         }
-
-       
-      
+     
         for(int16_t k = 0; k < nb_block_colonne/sampling_h; k++){
             
             for(int16_t i = 0; i < nb_block_ligne; i++){
-                   
+
                 for(int16_t i = 0; i < sampling_h * sampling_w; i++){
                     decode_ac_dc(d,d->list_scan_components[0].associated_dc_huffman_table_index,1,d->file,Y[i]);
                     decode_ac_dc(d,d->list_scan_components[0].associated_ac_huffman_table_index,0,d->file,Y[i]);
-
                     Y[i][0] = Y[i][0] + precDC;
                     precDC = Y[i][0];
                 }
@@ -211,13 +217,13 @@ int main(int argc, char **argv){
 
                  
                 for(int16_t i = 0; i < sampling_h*sampling_w; i++){
-                    iDCT(matrice_Y[i], pixel_Y[i]);
+                    iDCT(matrice_Y[i], pixel_Y[i],cos_tab);
                 }
                
 
-                iDCT(matrice_Cb, pixel_Cb);
+                iDCT(matrice_Cb, pixel_Cb,cos_tab);
               
-                iDCT(matrice_Cr, pixel_Cr);
+                iDCT(matrice_Cr, pixel_Cr,cos_tab);
 
                  
                 for(int x= 0 ; x < sampling_h; x++){
@@ -307,7 +313,6 @@ int main(int argc, char **argv){
         free(matrice_Cb);
         free(matrice_Cr);
 
-       
         
         for (int i = 0; i < 4; i++) {
             if(d->quantization_table_read[i] != NULL){
@@ -337,14 +342,13 @@ int main(int argc, char **argv){
             }
         }
         free(d->list_ac);
-        
 
 
-    
+        fclose(d->file);
         free(d);
       
 
-    } 
+    }
 
     return EXIT_SUCCESS;
 }

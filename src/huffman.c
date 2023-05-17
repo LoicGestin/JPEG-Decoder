@@ -94,7 +94,6 @@ permettant de décoder cette table*/
         length ++;
     }
 
-
 }
 
 void free_huff(struct cellule_huffman *h){
