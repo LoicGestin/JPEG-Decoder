@@ -171,7 +171,7 @@ struct data* decode_entete(char * path){
                     for (int16_t i = 0, offset = 17; i < total_symbols; i++, offset++) {
                         current_dht->huff_values[i] = data[offset];
                     }
-                    decode_huffman(current_dht, type);
+                    decode_huffman(current_dht);
                     printf("\n");
                     break;
                 }

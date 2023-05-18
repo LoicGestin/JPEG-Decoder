@@ -9,7 +9,7 @@ int8_t read_bit(BYTE byte, int8_t num_bit){
     la valeur correspondante au numéro de bitssssssssssssssssssssssssssssssssssssssssssss*/
     return (byte >> ( 7 - num_bit )) & 1 ;
 }
-int16_t * decode_ac_dc(struct data *d, int16_t index, int8_t table_type,FILE* file,  int16_t * block){
+int16_t * decode_ac_dc(struct data *d, int16_t index, int8_t table_type, FILE* file,  int16_t * block){
     /*Fonction prenant en entrée un pointeur vers notre structure data, un index, un type de table
     un pointeur vers un fichier et un pointeur vers un bloc et permettant de décoder les coefficients AC et DC*/
 
