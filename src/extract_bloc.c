@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include<stdlib.h>
+#include <stdlib.h>
+#include <stdint.h>
 
 #include "../include/extract_bloc.h"
 
