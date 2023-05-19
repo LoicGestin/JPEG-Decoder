@@ -6,9 +6,8 @@
 #include "../include/iDCT.h"
 
 #define pi 3.14159265359
-#define cos_16 cosf(pi/16)
-#define sin_16 sinf(pi/16)
-#define inverse_racine 1/sqrt(2)
+
+
 
 void iDCT_rapide(int16_t **phi, uint8_t **S ){
     /*Fonction réalisant l'inverse de la transformée en cosinus discrète à partir
@@ -50,7 +49,7 @@ void iDCT_rapide(int16_t **phi, uint8_t **S ){
         float ll0 = l0 + l1;
         float ll1 = l0 - l1;
         float ll2 =  l2*racine*cos6_16 - l3* racine*sin6_16;
-        float ll3 =  l3*racine*cos6_16 + l0* racine*sin6_16;
+        float ll3 =  l3*racine*cos6_16 + l2* racine*sin6_16;
         float ll4 = l4 + l6;
         float ll5 = l7 - l5;
         float ll6 = l4 - l6;
@@ -61,10 +60,10 @@ void iDCT_rapide(int16_t **phi, uint8_t **S ){
         l1 = ll1 + ll2;
         l2 = ll1 - ll2;
         l3 = ll0 - ll3;
-        l4 = l4 * cos3_16 - l7 * sin3_16;
-        l5 = l5 * cos1_16 - l6 * sin1_16;
-        l6 = l6 * cos1_16 + l5 * sin1_16;
-        l7 = l7 * cos3_16 + l4 * sin3_16;
+        l4 = ll4 * cos3_16 - ll7 * sin3_16;
+        l5 = ll5 * cos1_16 - ll6 * sin1_16;
+        l6 = ll6 * cos1_16 + ll5 * sin1_16;
+        l7 = ll7 * cos3_16 + ll4 * sin3_16;
 
         tmp[x][0] = l0 + l7;
         tmp[x][1] = l1 + l6; 
@@ -95,7 +94,7 @@ void iDCT_rapide(int16_t **phi, uint8_t **S ){
         float ll0 = l0 + l1;
         float ll1 = l0 - l1;
         float ll2 =  l2*racine*cos6_16 - l3* racine*sin6_16;
-        float ll3 =  l3*racine*cos6_16 + l0* racine*sin6_16;
+        float ll3 =  l3*racine*cos6_16 + l2* racine*sin6_16;
         float ll4 = l4 + l6;
         float ll5 = l7 - l5;
         float ll6 = l4 - l6;
@@ -106,10 +105,10 @@ void iDCT_rapide(int16_t **phi, uint8_t **S ){
         l1 = ll1 + ll2;
         l2 = ll1 - ll2;
         l3 = ll0 - ll3;
-        l4 = l4 * cos3_16 - l7 * sin3_16;
-        l5 = l5 * cos1_16 - l6 * sin1_16;
-        l6 = l6 * cos1_16 + l5 * sin1_16;
-        l7 = l7 * cos3_16 + l4 * sin3_16;
+        l4 = ll4 * cos3_16 - ll7 * sin3_16;
+        l5 = ll5 * cos1_16 - ll6 * sin1_16;
+        l6 = ll6 * cos1_16 + ll5 * sin1_16;
+        l7 = ll7 * cos3_16 + ll4 * sin3_16;
  
         S[0][x] = (uint8_t)round(fmaxf(0, fminf(255, (l0 + l7)/8+128)));
         S[1][x] = (uint8_t)round(fmaxf(0, fminf(255, (l1 + l6)/8+128))); 
