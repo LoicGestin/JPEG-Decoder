@@ -28,7 +28,7 @@ int main(int argc, char **argv){
         fprintf(stderr, "Usage: %s fichier.jpeg\n", argv[0]);
         return EXIT_FAILURE;
     }
-    struct data *d = decode_entete("../images/biiiiiig.jpg");
+    struct data *d = decode_entete("../images/poupoupidou.jpg");
   
     float cos_tab[8][8]; 
     for(int8_t i = 0; i < 8; i++){
@@ -44,7 +44,7 @@ int main(int argc, char **argv){
     int16_t precDC_Cb = 0;
     int16_t precDC_Cr = 0;
 
-    FILE *test_invaders = fopen("biiiiiig.ppm", "wb");
+    FILE *test_invaders = fopen("poupoupidou.ppm", "wb");
 
     if(d->nb_component_scan == 1){
         uint8_t ***mat=malloc(nb_block_ligne*sizeof(uint8_t **));
