@@ -5,7 +5,7 @@ LD = gcc
 # C'est utile pour débugger, par contre en "production"
 # on active au moins les optimisations de niveau 2 (-O2).
 CFLAGS = -Wall -Wextra -std=c99 -Iinclude -O0 -g
-LDFLAGS =
+LDFLAGS = -lm
 
 # Par défaut, on compile tous les fichiers source (.c) qui se trouvent dans le
 # répertoire src/
@@ -14,9 +14,9 @@ SRC_FILES=$(wildcard src/*.c)
 # Par défaut, la compilation de src/toto.c génère le fichier objet obj/toto.o
 OBJ_FILES=$(patsubst src/%.c,obj/%.o,$(SRC_FILES))
 
-all: jpeg2ppm
+all: decodage
 
-jpeg2ppm: $(OBJ_FILES) 
+decodage: $(OBJ_FILES) 
 	$(LD) $(OBJ_FILES) $(LDFLAGS) -o $@
 
 obj/%.o: src/%.c
@@ -25,4 +25,4 @@ obj/%.o: src/%.c
 .PHONY: clean
 
 clean:
-	rm -rf jpeg2ppm $(OBJ_FILES)
+	rm -rf decodage $(OBJ_FILES)

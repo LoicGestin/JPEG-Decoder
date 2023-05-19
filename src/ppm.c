@@ -131,7 +131,6 @@ void create_ppm(FILE * file_name,  uint8_t *** R,  uint8_t *** G,  uint8_t *** B
                     uint8_t green_pixel = G[k][i][j];
                     uint8_t blue_pixel = B[k][i][j];
 
-                    //fprintf(file_name, "%d %d %d", red_pixel, green_pixel, blue_pixel);
                     fputc(red_pixel, file_name);
                     fputc(green_pixel, file_name);
                     fputc(blue_pixel, file_name);
@@ -140,6 +139,4 @@ void create_ppm(FILE * file_name,  uint8_t *** R,  uint8_t *** G,  uint8_t *** B
             }
         }
     }
-
-    //printf("nb pixels : %d\n", nb_pixels);
 }

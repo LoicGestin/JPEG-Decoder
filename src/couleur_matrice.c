@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #include "../include/couleur_matrice.h"
 #include "../include/decode_entete.h"

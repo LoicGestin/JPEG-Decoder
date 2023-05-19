@@ -76,7 +76,7 @@ int main(int argc, char **argv){
 
                 zig_zag(block, matrice);
                 
-                iDCT(matrice, S,cos_tab);
+                iDCT_rapide(matrice, S);
                 
                 mat[i]=S;
 
@@ -226,13 +226,13 @@ int main(int argc, char **argv){
 
                  
                 for(int16_t i = 0; i < sampling_h*sampling_w; i++){
-                    iDCT(matrice_Y[i], pixel_Y[i],cos_tab);
+                    iDCT_rapide(matrice_Y[i], pixel_Y[i]);
                 }
                
 
-                iDCT(matrice_Cb, pixel_Cb,cos_tab);
+                iDCT_rapide(matrice_Cb, pixel_Cb);
               
-                iDCT(matrice_Cr, pixel_Cr,cos_tab);
+                iDCT_rapide(matrice_Cr, pixel_Cr);
 
                  
                 for(int x= 0 ; x < sampling_h; x++){

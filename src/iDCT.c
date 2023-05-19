@@ -6,8 +6,11 @@
 #include "../include/iDCT.h"
 
 #define pi 3.14159265359
+#define cos_16 cosf(pi/16)
+#define sin_16 sinf(pi/16)
+#define inverse_racine 1/sqrt(2)
 
-void iDCT(int16_t **phi, uint8_t **S, float cos_tab[8][8]){
+void iDCT_rapide(int16_t **phi, uint8_t **S ){
     /*Fonction réalisant l'inverse de la transformée en cosinus discrète à partir
     d'une matrice phi 8x8 et stockant le résultat dans une matrice S*/
 
@@ -31,7 +34,6 @@ void iDCT(int16_t **phi, uint8_t **S, float cos_tab[8][8]){
    
     int16_t tmp[8][8];
 
-    // Parcours des éléments de la matrice S
       for(int8_t x=0; x<8; x++){
         
           
