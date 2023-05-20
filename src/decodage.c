@@ -28,8 +28,10 @@ int main(int argc, char **argv){
         fprintf(stderr, "Usage: %s fichier.jpeg\n", argv[0]);
         return EXIT_FAILURE;
     }
+    // choix de l'image à décoder
     struct data *d = decode_entete("../images/bisou.jpeg");
-  
+    
+    // calcul pour l'iDCT rapide
     float cos_tab[8][8]; 
     for(int8_t i = 0; i < 8; i++){
         for(int8_t j = 0; j < 8; j++){
@@ -37,15 +39,19 @@ int main(int argc, char **argv){
         }
     }
 
+    // nombre de bloc par lignes et par colonnes
     int16_t nb_block_ligne = d->image_width / 8 + ((d->image_width % 8 != 0) ? 1 : 0);
     int16_t nb_block_colonne = d->image_height / 8 + ((d->image_height % 8 != 0) ? 1 : 0);
     
+    // initialisation des coefficients DC
     int16_t precDC = 0;
     int16_t precDC_Cb = 0;
     int16_t precDC_Cr = 0;
 
+    // fichier de sortie
     FILE *test_invaders = fopen("bisou.pgm", "wb");
 
+    // cas où nous disposons seulement de la composante Y
     if(d->nb_component_scan == 1){
         uint8_t ***mat=malloc(nb_block_ligne*sizeof(uint8_t **));
         create_pgm_header(test_invaders, d->image_width, d->image_height);
@@ -62,27 +68,33 @@ int main(int argc, char **argv){
             matrice[i]=malloc(8*sizeof(int16_t));
         }
 
-
+        // pour chaque bloc, on effectue les étapes du décodage
         for(int16_t k = 0; k < nb_block_colonne; k++){
 
             for (int16_t i = 0; i < nb_block_ligne; i++){
 
+                // décodage des coefficients AC/DC
                 decode_ac_dc(d,0,1,d->file,block);
                 decode_ac_dc(d,0,0,d->file,block);
                 block[0] = block[0] + precDC;
                 precDC = block[0];
 
+                // quantification inverse
                 quantification_inverse(d,0,block);
 
+                // zigzag inverse
                 zig_zag(block, matrice);
                 
+                // iDCT
                 iDCT_rapide(matrice, S);
                 
                 mat[i]=S;
 
             }
+            // création du fichier pgm
             create_pgm(test_invaders ,mat, d->image_width, d->image_height);
         }
+        // libération de la mémoire 
         fclose(test_invaders);
         free(mat);
         free(block);
@@ -95,15 +107,18 @@ int main(int argc, char **argv){
 
 
 }
+    // cas où on dispose des composante Y, Cb et Cr
     else{
-        
+        // création du fichier ppm
         create_ppm_header(test_invaders, d->image_width, d->image_height);
         struct component *comp = d->list_component;
+        // récupération des facteurs d'échantillonnages
         int8_t sampling_w = comp->sampling_horizontal;
         int8_t sampling_h = comp->sampling_vertical;
 
         nb_block_ligne = d->image_width / (8 * sampling_w) + ((d->image_width % (8 * sampling_w) != 0) ? 1 : 0);
 
+        // Allocation de mémoire pour les tableaux de matrices R,G et B
         uint8_t ***red=malloc(nb_block_ligne*sampling_w*sizeof(uint8_t **));
         for(int16_t i = 0; i < nb_block_ligne*sampling_w; i++){
             red[i] = malloc(8*sampling_h*sizeof(uint8_t *));
