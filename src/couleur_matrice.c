@@ -6,15 +6,19 @@
 #include "../include/decode_entete.h"
 
 void YCbCr_to_R(uint8_t **Y, uint8_t **Cr, struct data *d, uint8_t **R){
+    /*Fonction effectuant la conversion YCbCr to RGB pour la couleur rouge*/
 
+    // Récupération des facteurs d'échantillonnages
     struct component *comp = d->list_component;
     int8_t sampling_w = comp->sampling_horizontal;
     int8_t sampling_h = comp->sampling_vertical;
     
+    // Remplissage de la matrice
     for(uint8_t i=0; i<8*sampling_h; i++){
         for(uint8_t j=0; j<8*sampling_w; j++){
             //float r = Y[i][j] - 0.0009267 * (Cb[i][j] - 128) + 1.4016868 * (Cr[i][j] - 128);
             float r = Y[i][j] + 1.402 * (Cr[i][j] - 128);
+            // Troncature si les valeurs sont négatives ou supérieures à 255
             if(r < 0){
                 R[i][j] = 0;
             }
@@ -31,15 +35,19 @@ void YCbCr_to_R(uint8_t **Y, uint8_t **Cr, struct data *d, uint8_t **R){
 }
 
 void YCbCr_to_B(uint8_t **Y, uint8_t **Cb, struct data *d, uint8_t **B){
+    /*Fonction effectuant la conversion YCbCr to RGB pour la couleur bleue*/
 
+    // Récupération des facteurs d'échantillonnages
     struct component *comp = d->list_component;
     int8_t sampling_w = comp->sampling_horizontal;
     int8_t sampling_h = comp->sampling_vertical;
     
+    // Remplissage de la matrice
     for(uint8_t i=0; i<8*sampling_h; i++){
         for(uint8_t j=0; j<8*sampling_w; j++){
             //float b  = Y[i][j] + 1.7721604 * (Cb[i][j] - 128) + 0.0009902 * (Cr[i][j] - 128);
             float b = Y[i][j] + 1.772 * (Cb[i][j] - 128);
+            // Troncature si les valeurs sont négatives ou supérieures à 255
             if(b < 0){
                 B[i][j] = 0;
             }
@@ -56,16 +64,19 @@ void YCbCr_to_B(uint8_t **Y, uint8_t **Cb, struct data *d, uint8_t **B){
 }
 
 void YCbCr_to_G(uint8_t **Y, uint8_t **Cb, uint8_t **Cr, struct data *d, uint8_t **G){
+    /*Fonction effectuant la conversion YCbCr to RGB pour la couleur verte*/
 
+    // Récupération des facteurs d'échantillonnages
     struct component *comp = d->list_component;
     int8_t sampling_w = comp->sampling_horizontal;
     int8_t sampling_h = comp->sampling_vertical;
     
+    // Remplissage de la matrice
     for(uint8_t i=0; i<8*sampling_h; i++){
         for(uint8_t j=0; j<8*sampling_w; j++){
            //float g = Y[i][j] - 0.3436954 * (Cb[i][j] - 128) - 0.7141690 * (Cr[i][j] - 128);
            float g = Y[i][j] - 0.34414 * (Cb[i][j] - 128) - 0.71414 * (Cr[i][j] - 128);
-
+            // Troncature si les valeurs sont négatives ou supérieures à 255
            if(g < 0){
                 G[i][j] = 0;
             }
