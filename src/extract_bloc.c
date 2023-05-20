@@ -17,7 +17,7 @@ int16_t * decode_ac_dc(struct data *d, int16_t index, int8_t table_type, FILE* f
     // Déterminer la table de huffman (1 pour DC et 0 pour AC)
     struct dht_ac_dc *current_dht = table_type ?&d->list_dc[index] : &d->list_ac[index];
     
-    // Lecture d'un nouvel octet si d->num_bit vaut 1
+    // Lecture d'un nouvel octet si d->num_bit vaut -1
     if(d->num_bit == -1) {
         fread(&d->byte, 1, 1, file);
         d->num_bit = 0;
@@ -26,7 +26,7 @@ int16_t * decode_ac_dc(struct data *d, int16_t index, int8_t table_type, FILE* f
 
     int8_t bit;
 
-
+    // Initialisation d'une cellule de huffman pour la racine
     struct cellule_huffman *current_cel = current_dht->racine_huffman;
 
     int8_t cpt =table_type ? 0 : 1;
@@ -58,9 +58,10 @@ int16_t * decode_ac_dc(struct data *d, int16_t index, int8_t table_type, FILE* f
         if(current_cel->symbol == 0xff){
             printf("ERORR");
         }
-     
+        // On récupère le symbole quand on arrive à un noeud final
         int16_t symbol =current_cel->symbol;
 
+        // Si le symbole vaut 0, le coefficient est nul et les coefficients restants dans la table AC sont mis à 0
         if(symbol == 0){
             while(cpt != 64){
 
@@ -68,6 +69,7 @@ int16_t * decode_ac_dc(struct data *d, int16_t index, int8_t table_type, FILE* f
                 cpt ++;
             }
         }
+        // On récupère la magnitude
         int8_t magnitude = (symbol & 0xF);
         int8_t num_zeros = (symbol >> 4);
         while (num_zeros > 0) {
@@ -79,7 +81,7 @@ int16_t * decode_ac_dc(struct data *d, int16_t index, int8_t table_type, FILE* f
         int16_t value = 0;
 
         int8_t current_magnitude =  magnitude;
-      
+        // Lecture des bits correspondant pour former la valeur du coefficient
         if(current_magnitude > 0) {
             while (current_magnitude > 0) {
                 bit = read_bit(d->byte, d->num_bit);
@@ -99,7 +101,7 @@ int16_t * decode_ac_dc(struct data *d, int16_t index, int8_t table_type, FILE* f
                 }
                 current_magnitude--;
             }
-
+            // Ajustement de la valeur du coefficient si le bit de poids fort est 0 car cela veut dire que la valeur est négative
             if ((value & (1 << (magnitude - 1))) == 0) {
                 value +=(-(1 << magnitude) + 1);
             }
@@ -107,7 +109,9 @@ int16_t * decode_ac_dc(struct data *d, int16_t index, int8_t table_type, FILE* f
             block[cpt] = value;
             cpt ++;
         }
+        // Tous les bits de magnitude sont lus
         else{
+            // Ajout d'un coefficient nul si cpt<64
             if(cpt < 64){
             block[cpt] =0;
             cpt ++;
