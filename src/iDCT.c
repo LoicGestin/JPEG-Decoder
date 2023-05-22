@@ -6,14 +6,13 @@
 #include "../include/iDCT.h"
 
 #define pi 3.14159265359
-#define inverse_racine = 1 / sqrt(2);
-#define cos6_16  cosf((6 *pi)/16);
-#define sin6_16  sinf((6 *pi)/16);
-#define cos3_16  cosf((3 *pi)/16);
-#define sin3_16  sinf((3 *pi)/16);
-#define cos1_16  cosf((1 *pi)/16);
-#define sin1_16  sinf((1 *pi)/16);
-
+#define racine  sqrt(2)
+#define cos6_16  cosf((6 *pi)/16)
+#define sin6_16  sinf((6 *pi)/16)
+#define cos3_16  cosf((3 *pi)/16)
+#define sin3_16  sinf((3 *pi)/16)
+#define cos1_16  cosf((1 *pi)/16)
+#define sin1_16  sinf((1 *pi)/16)
 
 
 void iDCT_rapide(int16_t **phi, uint8_t **S ){
@@ -37,7 +36,7 @@ void iDCT_rapide(int16_t **phi, uint8_t **S ){
          
         float ll0 = l0 + l1;
         float ll1 = l0 - l1;
-        float ll2 =  l2*racine*cos6_16 - l3* racine*sin6_16;
+        float ll2 =  l2*(racine*cos6_16) - l3* (racine*sin6_16);
         float ll3 =  l3*racine*cos6_16 + l2* racine*sin6_16;
         float ll4 = l4 + l6;
         float ll5 = l7 - l5;
@@ -123,8 +122,6 @@ void iDCT(int16_t **phi, uint8_t **S, float cos_tab[8][8]){
 
     // dep = (1 / sqrt(16)) car n = 8
     float dep = (1 / sqrt(16));
-            
-    float racine = sqrt(2);
 
     // Moitié du coefficient DC
     float t1 =  (float)phi[0][0] / 2;
