@@ -19,7 +19,9 @@ struct data{
     struct component* list_component;
     // DHT
     struct dht_ac_dc* list_dc;
+    int8_t nb_dc;
     struct dht_ac_dc* list_ac;
+    int8_t nb_ac;
     // SOS
     int16_t nb_component_scan;
     struct scan_component* list_scan_components;
