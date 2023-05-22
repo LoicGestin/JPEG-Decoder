@@ -27,6 +27,8 @@ struct data* init_data() {
     data->list_component =  malloc(4 * sizeof(struct component));
 
     // DHT
+    data->nb_dc = 0;
+    data->nb_ac =0;
     data->list_dc =  malloc(4 * sizeof(struct dht_ac_dc ));
     data->list_ac =  malloc(4 * sizeof(struct dht_ac_dc ));
     // SOS
@@ -87,9 +89,15 @@ struct data* decode_entete(char * path){
             switch (byte) {
                 // image de type JFIF
                 case (0xE0): {
-                    printf("[APP0] length %d bytes\n", marker_length);
-                    printf("  JFIF application\n");
-                    printf("  other parameters ignored (%d bytes).\n", marker_length - 7);
+                    if(data[0] == 'J' && data[1] == 'F' && data[2] == 'I' && data[3] == 'F' && data[4] == '\0' && data[5] == 1 && data[6] == 1){
+                        printf("[APP0] length %d bytes\n", marker_length);
+                        printf("  JFIF application\n");
+                        printf("  other parameters ignored (%d bytes).\n", marker_length - 7);
+                    }
+                    else {
+                        printf("ERROR : no JFIF");
+                        exit(1);
+                    }
                     break;
                 }
                 // table de quantification
@@ -109,6 +117,11 @@ struct data* decode_entete(char * path){
                 case (0xC0): {
                     printf("[S0FO] length %d bytes\n", marker_length);                   
                     BYTE precision = data[0];
+                    if (precision != 8){
+                        printf("ERROR : precision different of 8");
+                        exit(1);
+                    }
+
                     int16_t height = (data[1] << 8) | data[2];
                     int16_t width = (data[3] << 8) | data[4];
                     printf("   sample precision %d\n", precision);
@@ -159,8 +172,10 @@ struct data* decode_entete(char * path){
                     struct dht_ac_dc *current_dht = NULL;
                     if (type) {
                         current_dht = &d->list_dc[index];
+                        d->nb_dc += 1;
                     } else {
                         current_dht = &d->list_ac[index];
+                        d->nb_ac += 1;
                     }
                     current_dht->table_type = type;
                     current_dht->nb_symbols = total_symbols;
