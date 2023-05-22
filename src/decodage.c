@@ -54,6 +54,12 @@ int main(int argc, char **argv){
     // cas où nous disposons seulement de la composante Y
     if(d->nb_component_scan == 1){
         uint8_t ***mat=malloc(nb_block_ligne*sizeof(uint8_t **));
+        for(int16_t i = 0; i < nb_block_ligne; i++){
+            mat[i] = malloc(8*sizeof(uint8_t *));
+            for(int16_t j = 0; j < 8; j++){
+                mat[i][j] = malloc(8*sizeof(uint8_t));
+            }
+        }
         create_pgm_header(test_invaders, d->image_width, d->image_height);
 
         int16_t *block = malloc(sizeof (int16_t) * 64);
