@@ -19,29 +19,29 @@ void iDCT_rapide(int16_t **phi, uint8_t **S ){
     /*Fonction réalisant l'inverse de la transformée en cosinus discrète à partir
     d'une matrice phi 8x8 et stockant le résultat dans une matrice S*/
    
-    int16_t tmp[8][8];
+    double tmp[8][8];
 
       for(int8_t x=0; x<8; x++){
         
           
-        float l0 = phi[x][0];
-        float l4 = phi[x][1] - phi[x][7];
-        float l2 = phi[x][2];
-        float l6 = phi[x][5] * racine;
-        float l7 = phi[x][1] + phi[x][7];
-        float l3 = phi[x][6];
-        float l5 = phi[x][3] * racine;
-        float l1 = phi[x][4];
+        double l0 = phi[x][0];
+        double l4 = phi[x][1] - phi[x][7];
+        double l2 = phi[x][2];
+        double l6 = phi[x][5] * racine;
+        double l7 = phi[x][1] + phi[x][7];
+        double l3 = phi[x][6];
+        double l5 = phi[x][3] * racine;
+        double l1 = phi[x][4];
 
          
-        float ll0 = l0 + l1;
-        float ll1 = l0 - l1;
-        float ll2 =  l2*(racine*cos6_16) - l3* (racine*sin6_16);
-        float ll3 =  l3*racine*cos6_16 + l2* racine*sin6_16;
-        float ll4 = l4 + l6;
-        float ll5 = l7 - l5;
-        float ll6 = l4 - l6;
-        float ll7 = l7 + l5;
+        double ll0 = l0 + l1;
+        double ll1 = l0 - l1;
+        double ll2 =  l2*(racine*cos6_16) - l3* (racine*sin6_16);
+        double ll3 =  l3*racine*cos6_16 + l2* racine*sin6_16;
+        double ll4 = l4 + l6;
+        double ll5 = l7 - l5;
+        double ll6 = l4 - l6;
+        double ll7 = l7 + l5;
         
         
         l0 = ll0 + ll3;
@@ -69,24 +69,24 @@ void iDCT_rapide(int16_t **phi, uint8_t **S ){
     for(int8_t x=0; x<8; x++){
 
            
-        float l0 = tmp[0][x];
-        float l4 = tmp[1][x] - tmp[7][x];
-        float l2 = tmp[2][x];
-        float l6 = tmp[5][x] * racine;
-        float l7 = tmp[1][x] + tmp[7][x];
-        float l3 = tmp[6][x];
-        float l5 = tmp[3][x] * racine;
-        float l1 = tmp[4][x];
+        double l0 = tmp[0][x];
+        double l4 = tmp[1][x] - tmp[7][x];
+        double l2 = tmp[2][x];
+        double l6 = tmp[5][x] * racine;
+        double l7 = tmp[1][x] + tmp[7][x];
+        double l3 = tmp[6][x];
+        double l5 = tmp[3][x] * racine;
+        double l1 = tmp[4][x];
 
          
-        float ll0 = l0 + l1;
-        float ll1 = l0 - l1;
-        float ll2 =  l2*racine*cos6_16 - l3* racine*sin6_16;
-        float ll3 =  l3*racine*cos6_16 + l2* racine*sin6_16;
-        float ll4 = l4 + l6;
-        float ll5 = l7 - l5;
-        float ll6 = l4 - l6;
-        float ll7 = l7 + l5;
+        double ll0 = l0 + l1;
+        double ll1 = l0 - l1;
+        double ll2 =  l2*racine*cos6_16 - l3* racine*sin6_16;
+        double ll3 =  l3*racine*cos6_16 + l2* racine*sin6_16;
+        double ll4 = l4 + l6;
+        double ll5 = l7 - l5;
+        double ll6 = l4 - l6;
+        double ll7 = l7 + l5;
         
         
         l0 = ll0 + ll3;

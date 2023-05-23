@@ -55,6 +55,7 @@ struct data* decode_entete(char * path){
     BYTE byte;
     int8_t marker_detected = 0;
     int32_t marker_length = 0;
+    size_t read_count;
     // Tant que nous pouvons lire dans le flux
     while (fread(&byte, 1, 1, file)) {
         // Détection de marqueur avec "ff"
@@ -78,12 +79,28 @@ struct data* decode_entete(char * path){
 
             BYTE msb, lsb;
 
-            fread(&msb, 1, 1, file);
-            fread(&lsb, 1, 1, file);
+         
+            read_count = fread(&msb, 1, 1, file);
+            if (read_count != 1) {
+                fclose(file);
+                exit(1);
+            }
+           
+
+            read_count = fread(&lsb, 1, 1, file);
+            if (read_count != 1) {
+                fclose(file);
+                exit(1);
+            }
             marker_length = (msb << 8) | lsb;
             BYTE *data = malloc(sizeof(BYTE *) * marker_length - 2);
             // Pas oublier le -2 car les octets pour donner la taille font partie de la taille
-            fread(data, marker_length - 2, 1, file);
+           
+            read_count =  fread(data, marker_length - 2, 1, file);
+            if (read_count != 1) {
+                fclose(file);
+                exit(1);
+            }
 
             // Détection des autres marqueurs et récupération des informations
             switch (byte) {

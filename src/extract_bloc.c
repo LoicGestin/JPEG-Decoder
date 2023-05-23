@@ -16,10 +16,14 @@ void decode_ac_dc(struct data *d, int16_t index, int8_t table_type, FILE* file, 
 
     // Déterminer la table de huffman (1 pour DC et 0 pour AC)
     struct dht_ac_dc *current_dht = table_type ?&d->list_dc[index] : &d->list_ac[index];
-    
+    size_t read_count;
     // Lecture d'un nouvel octet si d->num_bit vaut -1
     if(d->num_bit == -1) {
-        fread(&d->byte, 1, 1, file);
+        read_count =  fread(&d->byte, 1, 1, file);
+        if (read_count != 1) {
+            fclose(file);
+            exit(1);
+        }
         d->num_bit = 0;
     }
     //printf("byte = %x\n", d->byte);
@@ -31,7 +35,12 @@ void decode_ac_dc(struct data *d, int16_t index, int8_t table_type, FILE* file, 
 
     int8_t cpt =table_type ? 0 : 1;
     int8_t val = table_type ? 1 : 64;
-
+    int8_t magnitude;
+    int8_t num_zeros;
+    int16_t value;
+    int8_t current_magnitude;
+    int16_t symbol;
+  
     // Parcours de tous les coefficients
     while(cpt < val){
         // Parcours de l'arbre
@@ -41,9 +50,17 @@ void decode_ac_dc(struct data *d, int16_t index, int8_t table_type, FILE* file, 
             current_cel = bit ? current_cel->right : current_cel->left;
             // Lecture d'un nouvel octet si d->num_bit arrive à 7
             if(d->num_bit == 7){
-                fread(&d->byte, 1, 1, file);
+                read_count =  fread(&d->byte, 1, 1, file);
+                if (read_count != 1) {
+                    fclose(file);
+                    exit(1);
+                }
                 if(d->find_ff){
-                    fread(&d->byte, 1, 1, file);
+                    read_count =  fread(&d->byte, 1, 1, file);
+                    if (read_count != 1) {
+                        fclose(file);
+                        exit(1);
+                    }
                     d->find_ff = 0;
                 }
                 if(d->byte == 0xFF){
@@ -59,7 +76,7 @@ void decode_ac_dc(struct data *d, int16_t index, int8_t table_type, FILE* file, 
             printf("ERORR");
         }
         // On récupère le symbole quand on arrive à un noeud final
-        int16_t symbol =current_cel->symbol;
+        symbol =current_cel->symbol;
 
         // Si le symbole vaut 0, le coefficient est nul et les coefficients restants dans la table AC sont mis à 0
         if(symbol == 0){
@@ -70,17 +87,17 @@ void decode_ac_dc(struct data *d, int16_t index, int8_t table_type, FILE* file, 
             }
         }
         // On récupère la magnitude
-        int8_t magnitude = (symbol & 0xF);
-        int8_t num_zeros = (symbol >> 4);
+        magnitude = (symbol & 0xF);
+        num_zeros = (symbol >> 4);
         while (num_zeros > 0) {
 
             block[cpt] = 0;
             num_zeros--;
             cpt ++;
         }
-        int16_t value = 0;
+        value = 0;
 
-        int8_t current_magnitude =  magnitude;
+        current_magnitude =  magnitude;
         // Lecture des bits correspondant pour former la valeur du coefficient
         if(current_magnitude > 0) {
             while (current_magnitude > 0) {
@@ -89,9 +106,17 @@ void decode_ac_dc(struct data *d, int16_t index, int8_t table_type, FILE* file, 
 
                 d->num_bit++;
                 if (d->num_bit == 8) {
-                    fread(&d->byte, 1, 1, file);
+                    read_count =  fread(&d->byte, 1, 1, file);
+                    if (read_count != 1) {
+                        fclose(file);
+                        exit(1);
+                    }
                     if(d->find_ff){
-                        fread(&d->byte, 1, 1, file);
+                        read_count =  fread(&d->byte, 1, 1, file);
+                        if (read_count != 1) {
+                            fclose(file);
+                            exit(1);
+                        }
                         d->find_ff = 0;
                     }
                     if(d->byte == 0xFF){

@@ -317,13 +317,13 @@ int main(int argc, char **argv){
                 quantification_inverse(d,d->list_component[2].quantization_table_index,block_Cr);
 
                 for(int16_t i = 0; i < sampling_h*sampling_w; i++){
-                    zig_zag(Y[i], matrice_Y[i]);
+                    zig_zag_rapide(Y[i], matrice_Y[i]);
                 }
                
-                zig_zag(block_Cb, matrice_Cb);
+                zig_zag_rapide(block_Cb, matrice_Cb);
               
                  
-                zig_zag(block_Cr, matrice_Cr);
+                zig_zag_rapide(block_Cr, matrice_Cr);
 
                  
                 for(int16_t i = 0; i < sampling_h*sampling_w; i++){
@@ -340,31 +340,18 @@ int main(int argc, char **argv){
                     for(int i=0; i< 8 ;i++){
                         for(int j=0; j < 8*sampling_w; j++){
                             new_Y[(x * 8) + i ][j] = pixel_Y[(x * sampling_w) + j/8][i][j%8];
-                        }
+         
+                        }                  
                     }
                 }
-                       
-
                 if( sampling_h != 1 || sampling_w != 1){
                     sur_ech(pixel_Cb, d, new_Cb);
                     sur_ech(pixel_Cr, d, new_Cr);
-                  
-                    YCbCr_to_R(new_Y, new_Cr, d, red[i]);
-                    YCbCr_to_G(new_Y, new_Cb, new_Cr, d, green[i]);
-                    YCbCr_to_B(new_Y, new_Cb, d, blue[i]);
+                   YCbCr_to_RGB(new_Y, new_Cb, new_Cr, d, red[i], green[i], blue[i]);
                 }
                 else{
-                
-                    
-                    YCbCr_to_R(new_Y, pixel_Cr, d, red[i]);
-                    YCbCr_to_G(new_Y, pixel_Cb, pixel_Cr, d, green[i]);
-                    YCbCr_to_B(new_Y, pixel_Cb, d, blue[i]);
-
-            
-                }
-           
-              
-               
+                  YCbCr_to_RGB(new_Y, new_Cb, new_Cr, d, red[i], green[i], blue[i]);
+                }   
             }    
             // création du fichier ppm
             create_ppm(image, red, green , blue, d);
@@ -448,8 +435,6 @@ int main(int argc, char **argv){
             }
         }
         free(d->list_dc);
-        
-
         for(int8_t i = 0; i < d->nb_ac; i++ ){
             if(d->list_ac[i].huff_values != NULL){
                 free(d->list_ac[i].huff_values);
@@ -457,13 +442,8 @@ int main(int argc, char **argv){
             }
         }
         free(d->list_ac);
-
-
         fclose(d->file);
         free(d);
-      
-
     }
-
     return EXIT_SUCCESS;
 }
