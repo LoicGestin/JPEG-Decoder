@@ -79,7 +79,7 @@ int main(int argc, char **argv){
         // Création de l'entête de l'image
         create_pgm_header(image, d->image_width, d->image_height);
 
-        // Allocation de mémoire pour toutes les pointeurs que ous aurons besoin durant le décodage
+        // Allocation de mémoire pour tous les pointeurs dont nous aurons besoin durant le décodage
          uint8_t ***mat=malloc(nb_block_ligne*sizeof(uint8_t **));
         for(int16_t i = 0; i < nb_block_ligne; i++){
             mat[i] = malloc(8*sizeof(uint8_t *));
@@ -204,7 +204,7 @@ int main(int argc, char **argv){
         // Récupération du nombre de block par ligne
         nb_block_ligne = d->image_width / (8 * sampling_w) + ((d->image_width % (8 * sampling_w) != 0) ? 1 : 0);
 
-        // Allocation de mémoire pour toutes les pointeurs que ous aurons besoin durant le décodage
+        // Allocation de mémoire pour tous les pointeurs dont nous aurons besoin durant le décodage
         uint8_t ***red=malloc(nb_block_ligne*sampling_w*sizeof(uint8_t **));
         for(int16_t i = 0; i < nb_block_ligne*sampling_w; i++){
             red[i] = malloc(8*sampling_h*sizeof(uint8_t *));
@@ -288,6 +288,7 @@ int main(int argc, char **argv){
             
             for(int16_t i = 0; i < nb_block_ligne; i++){
 
+                // décodage des coefficients AC/DC
                 for(int16_t i = 0; i < sampling_h * sampling_w; i++){
                     decode_ac_dc(d,d->list_scan_components[0].associated_dc_huffman_table_index,1,d->file,Y[i]);
                     decode_ac_dc(d,d->list_scan_components[0].associated_ac_huffman_table_index,0,d->file,Y[i]);
@@ -306,7 +307,7 @@ int main(int argc, char **argv){
                 block_Cr[0] = block_Cr[0] + precDC_Cr;
                 precDC_Cr = block_Cr[0];
 
-
+                // quantification inverse
                 for(int16_t i = 0; i < sampling_h * sampling_w; i++){
                     quantification_inverse(d,d->list_component[0].quantization_table_index,Y[i]);
                 }
@@ -316,6 +317,7 @@ int main(int argc, char **argv){
                 
                 quantification_inverse(d,d->list_component[2].quantization_table_index,block_Cr);
 
+                // zig zag inverse
                 for(int16_t i = 0; i < sampling_h*sampling_w; i++){
                     zig_zag_rapide(Y[i], matrice_Y[i]);
                 }
@@ -325,7 +327,7 @@ int main(int argc, char **argv){
                  
                 zig_zag_rapide(block_Cr, matrice_Cr);
 
-                 
+                // iDCT
                 for(int16_t i = 0; i < sampling_h*sampling_w; i++){
                     iDCT_rapide(matrice_Y[i], pixel_Y[i]);
                 }
@@ -344,6 +346,7 @@ int main(int argc, char **argv){
                         }                  
                     }
                 }
+                // Conversion en RGB
                 if( sampling_h != 1 || sampling_w != 1){
                     sur_ech(pixel_Cb, d, new_Cb);
                     sur_ech(pixel_Cr, d, new_Cr);
