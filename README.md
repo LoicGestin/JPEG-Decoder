@@ -131,7 +131,7 @@ Ecriture du fichier PPM
 
 -sorties : image PPM
 
-# Structure du projet
+# Structure du projet au début
 ![Photo](Photo.jpg)
 
 
