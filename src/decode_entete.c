@@ -89,11 +89,13 @@ struct data* decode_entete(char * path){
             switch (byte) {
                 // image de type JFIF
                 case (0xE0): {
+                    // Vérification si nous avons bien une image encodée en mode JFIF
                     if(data[0] == 'J' && data[1] == 'F' && data[2] == 'I' && data[3] == 'F' && data[4] == '\0' && data[5] == 1 && data[6] == 1){
                         printf("[APP0] length %d bytes\n", marker_length);
                         printf("  JFIF application\n");
                         printf("  other parameters ignored (%d bytes).\n", marker_length - 7);
                     }
+                    // Sinon il y a erreur
                     else {
                         printf("ERROR : no JFIF");
                         exit(1);
@@ -117,6 +119,7 @@ struct data* decode_entete(char * path){
                 case (0xC0): {
                     printf("[S0FO] length %d bytes\n", marker_length);                   
                     BYTE precision = data[0];
+                    // Vérification si on a bien une précision de 8 sinon on renvoie u erreur 
                     if (precision != 8){
                         printf("ERROR : precision different of 8");
                         exit(1);

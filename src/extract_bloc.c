@@ -37,7 +37,7 @@ void decode_ac_dc(struct data *d, int16_t index, int8_t table_type, FILE* file, 
         // Parcours de l'arbre
         while(current_cel->right != NULL || current_cel->left != NULL){
             bit = read_bit(d->byte,d->num_bit);
-            //printf("Byte = %x  : %d %d %d %d %d %d %d %d\n",d->byte,read_bit(d->byte,0),read_bit(d->byte,1),read_bit(d->byte,2),read_bit(d->byte,3),read_bit(d->byte,4),read_bit(d->byte,5),read_bit(d->byte,6),read_bit(d->byte,7));
+            
             current_cel = bit ? current_cel->right : current_cel->left;
             // Lecture d'un nouvel octet si d->num_bit arrive à 7
             if(d->num_bit == 7){
