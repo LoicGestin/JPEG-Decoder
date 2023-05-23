@@ -28,16 +28,7 @@ int main(int argc, char **argv){
         return EXIT_FAILURE;
     }
     // choix de l'image à décoder
-    char * im = "./images/";
-    size_t len1 = strlen(im);
-    size_t len2 = strlen(argv[1]);
-
-    char* result = malloc((len1 + len2 + 1) * sizeof(char*));
-    memcpy(result, im, len1);
-    memcpy(result + len1, argv[1], len2);
-    result[len1 + len2] = '\0';
-
-    struct data *d = decode_entete(result);
+    struct data *d = decode_entete(argv[1]);
     
     // calcul pour l'iDCT 
     /*float cos_tab[8][8]; 
@@ -60,33 +51,33 @@ int main(int argc, char **argv){
     const char *filename = argv[1];
     int16_t cpt = 0;
 
+    while(filename[cpt] != '/'){
+        cpt++;
+    }
+
     
     while(filename[cpt] != '.'){
         //printf("%x\n", argv[1][l]);
         cpt ++;
     }
-
     char *name = malloc((cpt + 1) * sizeof(char *));
     memcpy(name, filename, cpt + 1);
     name[cpt + 1] = '\0';
 
-    size_t len3 = strlen(name);
-
-    char *result_final = malloc((len1 + len3 + 4)*sizeof(char*));
-    memcpy(result_final, im, len1);
-    memcpy(result_final + len1, name, len3);
+    char *result_final = malloc((cpt + 5)*sizeof(char*));
+    memcpy(result_final, name, cpt + 1);
 
     
     // Image en noir et blanc
     if(d->nb_component_scan == 1){
         
         // Ouverture du fichier
-        memcpy(result_final + len1 + len3, "pgm", 3);
-        result_final[len1 + len3 +  3] = '\0';
-        FILE *test_invaders = fopen(result_final, "wb");
+        memcpy(result_final + cpt + 1, "pgm", 3);
+        result_final[cpt +  5] = '\0';
+        FILE *image = fopen(result_final, "wb");
 
         // Création de l'entête de l'image
-        create_pgm_header(test_invaders, d->image_width, d->image_height);
+        create_pgm_header(image, d->image_width, d->image_height);
 
         // Allocation de mémoire pour toutes les pointeurs que ous aurons besoin durant le décodage
          uint8_t ***mat=malloc(nb_block_ligne*sizeof(uint8_t **));
@@ -137,11 +128,10 @@ int main(int argc, char **argv){
 
             }
             // création du fichier pgm
-            create_pgm(test_invaders ,mat, d->image_width, d->image_height);
+            create_pgm(image ,mat, d->image_width, d->image_height);
         }
         // libération de la mémoire 
-        fclose(test_invaders);
-        free(result);
+        fclose(image);
         free(name);
         free(result_final);
         for(int16_t i = 0; i < nb_block_ligne; i++){
@@ -199,8 +189,8 @@ int main(int argc, char **argv){
     else{
 
         // Ouverture du fichier 
-        memcpy(result_final + len1 + len3, "ppm", 3);
-        result_final[len1 + len3 +  3] = '\0';
+        memcpy(result_final + cpt + 1, "ppm", 3);
+        result_final[cpt +  5] = '\0';
         FILE *image = fopen(result_final, "wb");
 
         // Création de l'entête de l'image
@@ -364,6 +354,7 @@ int main(int argc, char **argv){
                     YCbCr_to_B(new_Y, new_Cb, d, blue[i]);
                 }
                 else{
+                
                     
                     YCbCr_to_R(new_Y, pixel_Cr, d, red[i]);
                     YCbCr_to_G(new_Y, pixel_Cb, pixel_Cr, d, green[i]);
@@ -376,13 +367,12 @@ int main(int argc, char **argv){
                
             }    
             // création du fichier ppm
-            create_ppm(test_invaders, red, green , blue, d);
+            create_ppm(image, red, green , blue, d);
         }
         
         // libération de la mémoire
 
-        fclose(test_invaders); 
-        free(result);
+        fclose(image); 
         free(name);
         free(result_final);
 
