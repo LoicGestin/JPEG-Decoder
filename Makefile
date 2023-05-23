@@ -14,9 +14,9 @@ SRC_FILES=$(wildcard src/*.c)
 # Par défaut, la compilation de src/toto.c génère le fichier objet obj/toto.o
 OBJ_FILES=$(patsubst src/%.c,obj/%.o,$(SRC_FILES))
 
-all: decodage
+all: jpeg2ppm
 
-decodage: $(OBJ_FILES) 
+jpeg2ppm: $(OBJ_FILES) 
 	$(LD) $(OBJ_FILES) $(LDFLAGS) -o $@
 
 obj/%.o: src/%.c
@@ -25,4 +25,4 @@ obj/%.o: src/%.c
 .PHONY: clean
 
 clean:
-	rm -rf decodage $(OBJ_FILES)
+	rm -rf jpeg2ppm $(OBJ_FILES)
