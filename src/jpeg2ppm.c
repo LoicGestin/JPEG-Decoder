@@ -33,11 +33,10 @@ int main(int argc, char **argv){
     size_t len2 = strlen(argv[1]);
 
     char* result = malloc((len1 + len2 + 1) * sizeof(char*));
+    memcpy(result, im, len1);
+    memcpy(result + len1, argv[1], len2);
+    result[len1 + len2] = '\0';
 
-
-    strcpy(result, im);
-
-    strcat(result, argv[1]);
     struct data *d = decode_entete(result);
     
     // calcul pour l'iDCT 
@@ -58,39 +57,30 @@ int main(int argc, char **argv){
     int16_t precDC_Cr = 0;
 
     // fichier de sortie
+    const char *filename = argv[1];
     int16_t cpt = 0;
-    int16_t l = 0;
+
     
-    while(argv[1][l] != '.'){
+    while(filename[cpt] != '.'){
         //printf("%x\n", argv[1][l]);
         cpt ++;
-        l ++;
     }
 
-    char *name = malloc((cpt+1) * sizeof(char *));
-
-    for (int16_t i = 0; i < cpt + 1;  i++){
-        name[i] = argv[1][i];
-        
-    }
+    char *name = malloc((cpt + 1) * sizeof(char *));
+    memcpy(name, filename, cpt + 1);
     name[cpt + 1] = '\0';
+
+    size_t len3 = strlen(name);
+
+    char *result_final = malloc((len1 + len3 + 4)*sizeof(char*));
+    memcpy(result_final, im, len1);
+    memcpy(result_final + len1, name, len3);
+    result_final[len1 + len3 +  3] = '\0';
     
     // cas où nous disposons seulement de la composante Y
     if(d->nb_component_scan == 1){
- 
-        size_t len2 = strlen(name);
-
-        char* result_final = malloc((len1 + len2 + 4) * sizeof(char*));
-        if (result_final == NULL) {
-            fprintf(stderr, "Memory allocation failed.\n");
-            exit(1);
-        }
-
-        strcpy(result_final, im);
-
-        strcat(result_final, name);
-        strcat(result_final, "pgm");
-
+        
+        memcpy(result_final + len1 + len3, "pgm", 3);
         FILE *test_invaders = fopen(result_final, "wb");
 
         uint8_t ***mat=malloc(nb_block_ligne*sizeof(uint8_t **));
@@ -102,7 +92,7 @@ int main(int argc, char **argv){
         }
         create_pgm_header(test_invaders, d->image_width, d->image_height);
 
-        int16_t *block = malloc(sizeof (int16_t) * 64);
+        int16_t *block = malloc(64 * sizeof (int16_t));
 
         uint8_t **S=malloc(8*sizeof(uint8_t*));
         for(int8_t x=0; x<8; x++){
@@ -146,6 +136,9 @@ int main(int argc, char **argv){
         }
         // libération de la mémoire 
         fclose(test_invaders);
+        free(result);
+        free(name);
+        free(result_final);
         for(int16_t i = 0; i < nb_block_ligne; i++){
             for(int16_t j = 0; j < 8; j++){
                free(mat[i][j]);
@@ -201,23 +194,15 @@ int main(int argc, char **argv){
     else{
         // création du fichier ppm*
 
-        size_t len2 = strlen(name);
-        
-         
-         
-        char* result_final = (char*)malloc((len1 + len2 + 4) * sizeof(char));
-
-        strcpy(result_final, im);
-
-        strcat(result_final, name);
-        strcat(result_final, "ppm");
-
+        memcpy(result_final + len1 + len3, "ppm", 3);
+        result_final[len1 + len3 +  3] = '\0';
         FILE *test_invaders = fopen(result_final, "wb");
 
 
 
         create_ppm_header(test_invaders, d->image_width, d->image_height);
         struct component *comp = d->list_component;
+
         // récupération des facteurs d'échantillonnages
         int8_t sampling_w = comp->sampling_horizontal;
         int8_t sampling_h = comp->sampling_vertical;
@@ -390,6 +375,9 @@ int main(int argc, char **argv){
         }
         
         fclose(test_invaders); 
+        free(result);
+        free(name);
+        free(result_final);
 
         for(int i = 0; i < nb_block_ligne*sampling_w ; i ++){
             for(uint8_t j=0; j<8*sampling_h; j++){
