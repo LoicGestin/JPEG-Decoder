@@ -75,23 +75,28 @@ int main(int argc, char **argv){
     char *result_final = malloc((len1 + len3 + 4)*sizeof(char*));
     memcpy(result_final, im, len1);
     memcpy(result_final + len1, name, len3);
-    result_final[len1 + len3 +  3] = '\0';
+
     
-    // cas où nous disposons seulement de la composante Y
+    // Image en noir et blanc
     if(d->nb_component_scan == 1){
         
+        // Ouverture du fichier
         memcpy(result_final + len1 + len3, "pgm", 3);
+        result_final[len1 + len3 +  3] = '\0';
         FILE *test_invaders = fopen(result_final, "wb");
 
-        uint8_t ***mat=malloc(nb_block_ligne*sizeof(uint8_t **));
+        // Création de l'entête de l'image
+        create_pgm_header(test_invaders, d->image_width, d->image_height);
+
+        // Allocation de mémoire pour toutes les pointeurs que ous aurons besoin durant le décodage
+         uint8_t ***mat=malloc(nb_block_ligne*sizeof(uint8_t **));
         for(int16_t i = 0; i < nb_block_ligne; i++){
             mat[i] = malloc(8*sizeof(uint8_t *));
             for(int16_t j = 0; j < 8; j++){
                 mat[i][j] = malloc(8*sizeof(uint8_t));
             }
         }
-        create_pgm_header(test_invaders, d->image_width, d->image_height);
-
+        
         int16_t *block = malloc(64 * sizeof (int16_t));
 
         uint8_t **S=malloc(8*sizeof(uint8_t*));
@@ -190,26 +195,26 @@ int main(int argc, char **argv){
 
 
 }
-    // cas où on dispose des composante Y, Cb et Cr
+    // Image en couleur
     else{
-        // création du fichier ppm*
 
+        // Ouverture du fichier 
         memcpy(result_final + len1 + len3, "ppm", 3);
         result_final[len1 + len3 +  3] = '\0';
-        FILE *test_invaders = fopen(result_final, "wb");
+        FILE *image = fopen(result_final, "wb");
 
-
-
-        create_ppm_header(test_invaders, d->image_width, d->image_height);
-        struct component *comp = d->list_component;
+        // Création de l'entête de l'image
+        create_ppm_header(image, d->image_width, d->image_height);
 
         // récupération des facteurs d'échantillonnages
+        struct component *comp = d->list_component;
         int8_t sampling_w = comp->sampling_horizontal;
         int8_t sampling_h = comp->sampling_vertical;
 
+        // Récupération du nombre de block par ligne
         nb_block_ligne = d->image_width / (8 * sampling_w) + ((d->image_width % (8 * sampling_w) != 0) ? 1 : 0);
 
-        // Allocation de mémoire pour les tableaux de matrices R,G et B
+        // Allocation de mémoire pour toutes les pointeurs que ous aurons besoin durant le décodage
         uint8_t ***red=malloc(nb_block_ligne*sampling_w*sizeof(uint8_t **));
         for(int16_t i = 0; i < nb_block_ligne*sampling_w; i++){
             red[i] = malloc(8*sampling_h*sizeof(uint8_t *));
@@ -370,10 +375,12 @@ int main(int argc, char **argv){
               
                
             }    
-        
+            // création du fichier ppm
             create_ppm(test_invaders, red, green , blue, d);
         }
         
+        // libération de la mémoire
+
         fclose(test_invaders); 
         free(result);
         free(name);
