@@ -25,27 +25,27 @@ Rajouter **régulièrement** des informations sur l'avancement de votre projet e
 Idée avant les implémentations :
 
 Lecture en-tête JPEG:
-$\\$
+
 -entrées : chemin du fichier jpeg
-$\\$
+
 -sorties : structure data : toutes les infos
 
 Gestion des tables de Huffman:
-$\\$
+
 -entrées : caractères et leur probas
-$\\$
+
 -sorties : mots binaires
 
 Extraction des blocs:
-$\\$
+
 -entrées : image
-$\\$
+
 -sorties : cases
 
 Quantification inverse :
-$\\$
+
 -entrées : bloc fréquentiel, table de quatification (luminance/chrominance)
-$\\$
+
 -sorties : matrice de quantification inverse
 
 Zig-Zag :
@@ -53,82 +53,82 @@ Zig-Zag :
 -sorties : matrice 8x8
 
 iDCT :
-$\\$
+
 -entrées : coordonnées spatiales x et y, bloc fréquentiel (voir formule)
-$\\$
+
 -sorties : bloc spatial
 
 Upsampling :
-$\\$
+
 -entrées : échantillon / sous-échantillons
-$\\$
+
 -sorties : sur échantillon
 
 YCbCr to RGB : 
-$\\$
+
 -entrées : Y, Cb, Cr
-$\\$
+
 -sorties : R, G, B
 
 
 Ecriture du fichier PPM
-$\\$
+
 -entrées : R,G,B
-$\\$
+
 -sorties : image PPM
 
 Après les implémentation : 
 
 Lecture en-tête JPEG:
-$\\$
+
 -entrées : chemin du fichier jpeg
-$\\$
+
 -sorties : structure data : toutes les infos
 
 Gestion des tables de Huffman:
-$\\$
+
 -entrées : une structure dht_ac_dc, la valeur et la longueur, la symbole, une cellule huffman
-$\\$
+
 -sorties : rien
 
 Extraction des blocs:
-$\\$
+
 -entrées : le fichier, la structure data, l'index pour les listes dc et ac, la type de la table et un block à remplir
-$\\$
+
 -sorties : rien
 
 Quantification inverse :
-$\\$
+
 -entrées : bloc fréquentiel, table de quatification (luminance/chrominance) (on se sert du bloc fréquentiel)
-$\\$
+
 -sorties : rien
 
 Zig-Zag :
 -entrées : vecteur 1x64 et la matrice à remplir
 -sorties : rien
 iDCT :
-$\\$
+
 -entrées : bloc fréquentiel (voir formule) et la matrice à remplir 
-$\\$
+
 -sorties : rien
 
 Upsampling :
-$\\$
+
 -entrées : La matrice Cb ou Cr et la nouvelle matrice après sur-échantillonage à remplir
-$\\$
+
 -sorties : rien
 
 YCbCr to RGB : 
-$\\$
+
 -entrées : Y, Cb, Cr, la matrice R ou B ou G vide à remplir
-$\\$
+
 -sorties : rien
 
 
 Ecriture du fichier PPM
-$\\$
+
 -entrées : R,G,B
-$\\$
+
 -sorties : image PPM
 
 # Structure du projet
