@@ -182,7 +182,6 @@ int main(int argc, char **argv){
         // Ouverture du fichier 
         memcpy(result_final + cpt + 1, "ppm", 3);
         result_final[cpt +  4] = '\0';
-        printf("result = %s\n", result_final);
         FILE *image = fopen(result_final, "wb");
 
         // Création de l'entête de l'image
