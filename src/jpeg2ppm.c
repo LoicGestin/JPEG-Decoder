@@ -29,14 +29,6 @@ int main(int argc, char **argv){
     }
     // choix de l'image à décoder
     struct data *d = decode_entete(argv[1]);
-    
-    // calcul pour l'iDCT 
-    /*float cos_tab[8][8]; 
-    for(int8_t i = 0; i < 8; i++){
-        for(int8_t j = 0; j < 8; j++){
-            cos_tab[i][j] = cosf(((2*j+1)*i*pi)/(16));
-        }
-    }*/
 
     // nombre de bloc par lignes et par colonnes
     int16_t nb_block_ligne = d->image_width / 8 + ((d->image_width % 8 != 0) ? 1 : 0);
@@ -57,14 +49,13 @@ int main(int argc, char **argv){
 
     
     while(filename[cpt] != '.'){
-        //printf("%x\n", argv[1][l]);
         cpt ++;
     }
     char *name = malloc((cpt + 1) * sizeof(char *));
     memcpy(name, filename, cpt + 1);
     name[cpt + 1] = '\0';
 
-    char *result_final = malloc((cpt + 5)*sizeof(char*));
+    char *result_final = malloc((cpt + 4)*sizeof(char*));
     memcpy(result_final, name, cpt + 1);
 
     
@@ -73,7 +64,7 @@ int main(int argc, char **argv){
         
         // Ouverture du fichier
         memcpy(result_final + cpt + 1, "pgm", 3);
-        result_final[cpt +  5] = '\0';
+        result_final[cpt +  4] = '\0';
         FILE *image = fopen(result_final, "wb");
 
         // Création de l'entête de l'image
@@ -190,7 +181,8 @@ int main(int argc, char **argv){
 
         // Ouverture du fichier 
         memcpy(result_final + cpt + 1, "ppm", 3);
-        result_final[cpt +  5] = '\0';
+        result_final[cpt +  4] = '\0';
+        printf("result = %s\n", result_final);
         FILE *image = fopen(result_final, "wb");
 
         // Création de l'entête de l'image

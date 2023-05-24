@@ -109,7 +109,9 @@ void iDCT_rapide(int16_t **phi, uint8_t **S ){
      
     }
 }
-void iDCT(int16_t **phi, uint8_t **S, float cos_tab[8][8]){
+
+
+void iDCT(int16_t **phi, uint8_t **S){
     /*Fonction réalisant l'inverse de la transformée en cosinus discrète à partir
     d'une matrice phi 8x8 et stockant le résultat dans une matrice S*/
 
